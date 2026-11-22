@@ -255,12 +255,30 @@ def make_bezel():
     b = b.edges(cq.selectors.BoxSelector((-POCKET_W / 2 - 0.2, -POCKET_H / 2 - 0.2, T - 0.05),
                                          (POCKET_W / 2 + 0.2, POCKET_H / 2 + 0.2, T + 0.05))).chamfer(LIP_CH)
     b = b.cut(_groove_tool())
+    for blk in _bezel_corner_blocks(0.0):      # Innenecken Band/Seitenwand R SEAT_R, passend zur Deckel-/Bodenrundung
+        b = b.union(blk)
     for x in BZ_SCREW_X:                       # M2,5 Senkkopf von unten
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.4, H / 2 - RAB_Y + 0.2, cq.Vector(x, -H / 2 - 0.1, BZ_SCREW_Z),
                                                                cq.Vector(0, 1, 0))))
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCone(2.75, 1.25, 1.5, cq.Vector(x, -H / 2 - 0.01, BZ_SCREW_Z),
                                                            cq.Vector(0, 1, 0))))
     return cq.Workplane("XY").add(b.val().Solids()[0])
+
+
+def _bezel_corner_blocks(clr):
+    """Ausrundungsblöcke der sichtbaren Innenecken (oben über dem Falz, unten Bodenauflage). clr > 0: Freischnitt im Träger."""
+    zb, ix = T - BAND, W / 2 - END_W
+    out = []
+    for sx in (1, -1):
+        for y0, y1 in ((RAB_Y, H / 2), (-H / 2, -H / 2 + BOT_T)):
+            h = y1 - y0 + 2 * clr
+            blk = (cq.Workplane("XY").box(SEAT_R + clr, h, SEAT_R + clr, centered=(False, False, False))
+                   .translate((sx * ix - (SEAT_R + clr if sx > 0 else 0), y0 - clr, zb - SEAT_R - clr)))
+            if clr == 0:
+                cyl = cq.Solid.makeCylinder(SEAT_R, h + 0.2, cq.Vector(sx * (ix - SEAT_R), y0 - 0.1, zb - SEAT_R), cq.Vector(0, 1, 0))
+                blk = blk.cut(cq.Workplane("XY").add(cyl))
+            out.append(blk)
+    return out
 
 
 def make_carrier():
@@ -272,6 +290,8 @@ def make_carrier():
     reg = reg.union(cq.Workplane("XY").box(2 * (W / 2 - END_W - BZ_CLR), H + 2, zb - z0, centered=(True, True, False))
                     .translate((0, 0, z0)))
     c = _front_body().intersect(reg)
+    for blk in _bezel_corner_blocks(BZ_CLR):  # sichtbare Eckausrundung gehört zur Blende
+        c = c.cut(blk)
     for x in BZ_SCREW_X:
         c = c.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.03, 6.0, cq.Vector(x, -RAB_Y, BZ_SCREW_Z), cq.Vector(0, 1, 0))))
     return cq.Workplane("XY").add(c.val().Solids()[0])
