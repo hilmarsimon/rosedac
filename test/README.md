@@ -23,7 +23,7 @@ Alles hier wird später im Gerät weiterverwendet.
 | Schaumstoff 1 mm selbstklebend | Rest | zwischen Klammer und Display |
 | Dämpfungsfett (Nyogel 767A oder ähnlich) | wenig | Drehgefühl |
 
-## 2. Druckteile (Ordner `cad/out/testfront/`, STL + STEP; erzeugt von `cad/testfront.py`)
+## 2. Druckteile (STL + STEP in `cad/out/cad/testfront/`, DXF in `cad/out/dxf/testfront/`; erzeugt von `cad/testfront.py`)
 
 **Testfront einteilig (empfohlen):** `Testfront_einteilig_CNC.step` (430 × 88 × 12) bei JLCCNC aus **POM schwarz** fräsen lassen,
 M3-Gewinde direkt in POM (Gewinde in der Bestellung angeben). Alternativ `Testfront_einteilig_Druck.stl/.step` (Ø4 für Einschmelzmuttern)

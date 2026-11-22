@@ -8,8 +8,8 @@ Schwerpunkt bisher: Front, Drehknopf, Gehäuse, Bedienlogik, Hardware-Architektu
 | Ordner | Inhalt |
 |---|---|
 | `cad/` | Parametrische CAD-Skripte (CadQuery/Python), Zeichnungen, Ansichten, Platzpläne |
-| `cad/out/` | Erzeugte Dateien: STEP, PDF, PNG, DXF, CSV (Stand im Repo = letzter Build) |
-| `cad/out/testfront/` | Testfront 1:1 (einteilig CNC/Druck, zweiteilig Druck), Knopfteile, Plexiglas-DXF |
+| `cad/out/` | Erzeugte Dateien, nach Typ sortiert: `cad/` (STEP, STL), `dxf/`, `pdf/`, `bilder/` (PNG), `daten/` (CSV) |
+| `cad/out/*/testfront/` | Testfront 1:1 (einteilig CNC/Druck, zweiteilig Druck), Knopfteile, Plexiglas-DXF |
 | `test/` | Testaufbau Displays/Plexiglas/Drehknopf: Pi-UI (`pi/`), RP2040-Firmware (`pico/`), Anleitung + Prüfprotokoll |
 | `doc/` | Entscheidungen, offene Punkte, Bezugsquellen |
 
@@ -17,7 +17,7 @@ Schwerpunkt bisher: Front, Drehknopf, Gehäuse, Bedienlogik, Hardware-Architektu
 
 ```bash
 pip install -r requirements.txt          # + Systempakete: librsvg2-bin, imagemagick
-cad/build_all.sh                          # erzeugt alles in cad/out/
+cad/build_all.sh                          # erzeugt alles in cad/out/ und sortiert nach Typ
 ```
 Zentrale Parameter (Maße, Laschen, Deckel, Nut, Rippen, Knopf) stehen in `cad/frontplatte.py`; alle anderen Skripte importieren sie.
 

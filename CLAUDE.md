@@ -7,6 +7,8 @@ DIY-Nachbau HiFi Rose RD160. Sprache in Code-Kommentaren, Doku und Antworten: De
 - Nach jeder Geometrieänderung: `cad/build_all.sh` laufen lassen (frontplatte.py zuerst – sie leert `cad/out/`), dann
   Gültigkeit (`isValid()`) und Kollisionen (`intersect().Volume()`) prüfen. Die Kollisionsprüfung steht am Ende von `frontplatte.py`.
 - Erzeugte Dateien in `cad/out/` werden mit eingecheckt (Bestellung bei JLCCNC/JLCPCB direkt aus dem Repo).
+  Skripte schreiben flach nach `cad/out/` (bzw. `cad/out/testfront/`); `sortiere_ausgaben.py` verteilt am Ende von
+  `build_all.sh` nach `cad/`, `dxf/`, `pdf/`, `bilder/`, `daten/`. Neue Dateitypen dort in `ZIEL` eintragen.
 - SVG-Ansichten: Ausrichtung per PNG-Drehung korrigieren (Rückansicht −90°, Vorderansicht +90°, Rx(90) auf dem Compound).
 - Test-Software: `test/pi/rd160_ui.py` (pygame, zwei Fenster, kmsdrm), `test/pico/main.py` (MicroPython). Protokoll RP2040 ↔ Pi:
   JSON-Zeilen `{"ev":"enc","d":n}`, `{"ev":"btn","id":"..."}`, `{"cmd":"led","v":0..255}` – bleibt für die spätere C-Firmware gleich.
