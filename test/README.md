@@ -25,13 +25,13 @@ Alles hier wird später im Gerät weiterverwendet.
 
 ## 2. Druckteile (STL + STEP in `cad/out/cad/testfront/`, DXF in `cad/out/dxf/testfront/`; erzeugt von `cad/testfront.py`)
 
-**Testfront einteilig (empfohlen):** `Testfront_einteilig_CNC.step` (430 × 88 × 12) bei JLCCNC aus **POM schwarz** fräsen lassen,
+**Testfront einteilig (empfohlen):** `Testfront_einteilig_CNC.step` (430 × 78 × 12) bei JLCCNC aus **POM schwarz** fräsen lassen,
 M3-Gewinde direkt in POM (Gewinde in der Bestellung angeben). Alternativ `Testfront_einteilig_Druck.stl/.step` (Ø4 für Einschmelzmuttern)
 bei einem Druckdienst mit Bauraum ≥ 440 mm (SLA-Harz schwarz). Zweiteilige Druckversion nur für eigene Drucker < 440 mm.
 
 | Datei | Material | Ausrichtung |
 |---|---|---|
-| Testfront_links / Testfront_rechts (je 215 × 88 × 12) | PETG schwarz, 0,2 mm, 4 Wände | Rückseite aufs Bett |
+| Testfront_links / Testfront_rechts (je 215 × 78 × 12) | PETG schwarz, 0,2 mm, 4 Wände | Rückseite aufs Bett |
 | Displayklammer (4×) | PETG | Lasche aufs Bett |
 | Sensorhalter_Knopf | PETG | flache Seite aufs Bett |
 | Knopf_Becher, Knopf_Konus, Knopf_Haltescheibe | PLA/PETG (Alu später CNC) | Öffnung nach oben |

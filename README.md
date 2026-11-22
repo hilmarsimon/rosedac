@@ -1,6 +1,6 @@
 # rosedac – DIY-Nachbau HiFi Rose RD160
 
-Nachbau des HiFi Rose RD160 (DAC mit Dual-AMOLED-Front hinter Plexiglas, beleuchteter Drehknopf, Alu-Gehäuse 430 × 88 × 327 mm).
+Nachbau des HiFi Rose RD160 (DAC mit Dual-AMOLED-Front hinter Plexiglas, beleuchteter Drehknopf, Alu-Gehäuse 430 × 78 × 327 mm ohne Füße).
 Schwerpunkt bisher: Front, Drehknopf, Gehäuse, Bedienlogik, Hardware-Architektur, Testaufbau.
 
 ## Struktur
@@ -25,7 +25,7 @@ Zentrale Parameter (Maße, Laschen, Deckel, Nut, Rippen, Knopf) stehen in `cad/f
 
 ## Stand (11/2026)
 
-- **Front:** Alu-Rahmen 430 × 88, Plexiglas 9H04 SC/7H25 GT vollflächig, 2× DFRobot DFR0524 5,5" AMOLED, 10 Taster, Einschalttaster.
+- **Front:** Alu-Rahmen 430 × 78, Plexiglas 9H04 SC/7H25 GT vollflächig, 2× DFRobot DFR0524 5,5" AMOLED, 10 Taster, Einschalttaster.
 - **Drehknopf:** Alu-Becher Ø50, PMMA-Lichtleiter, Lager 6805-2RS, AS5600 + Magnet, 12 weiße LEDs (PWM ≥ 25 kHz); Knopfplatine mit Schaltplan.
 - **Gehäuse:** Seitenteile als C-Profil mit Rippen außen; Front ↔ Seitenteil über waagerechte Laschen + senkrechte M3-Senkschraube;
   Deckel 5 mm eben mit Feder in Nut im Band, Schaumstoff, Ziernut; hinten von unten verschraubt; Bodenblech 1 mm.
