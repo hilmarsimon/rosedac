@@ -1,0 +1,18 @@
+Referenz;Anzahl;Bauteil;Funktion;Gehäuse
+U1;1;AS5600-ASOM;Magnet-Drehgeber 12 bit, I²C 0x36;SOIC-8
+D1–D12;12;LED weiß PLCC-2 3528;Leuchtring, ~3,0 V @ 10 mA;PLCC-2 3528
+R3–R14;12;200 Ω 1 %;LED-Vorwiderstand;0603
+Q1;1;AO3400A;N-MOSFET, Logikpegel;SOT-23
+R15;1;220 Ω;Gate-Widerstand;0603
+R16;1;100 kΩ;Gate-Pull-down;0603
+R1, R2;2;4,7 kΩ;I²C-Pull-up (optional);0603
+R17;1;1 kΩ;Serienwiderstand Taster;0603
+C1;1;100 nF X7R 16 V;Entkopplung U1;0603
+C2;1;1 µF X7R 16 V;Entkopplung U1;0603
+C3;1;10 µF X5R 10 V;Puffer +5V_LED;0805
+C4;1;10 nF X7R 50 V;Entprellung / ESD;0603
+FB1;1;Ferrit 600 Ω @ 100 MHz, ≥ 500 mA;Trennt LED-Strom von der Zuleitung;0805
+SW1;1;Omron B3F-1000;Einschalttaster 6×6 mm, 4,3 mm hoch;THT
+J1;1;JST B7B-PH-K-S;Stecker 7-pol., Platinenrückseite;THT
+TP1, TP2;2;Testpunkt;AS5600 OUT, PGO;Pad Ø1 mm
+–;1;Magnet diametral Ø6 × 2,5 mm, N35;in der Knopfnabe;–

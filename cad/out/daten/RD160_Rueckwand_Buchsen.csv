@@ -1,0 +1,17 @@
+Pos;Gravur;Bauteil;v [mm];y [mm];Ausschnitt;Tiefe innen [mm]
+1;BREAKER;E-T-A 1658-G21-02-P10-2A (Gewinde 3/8-27, D-Fläche);-180;18.0;Ø9.6 / Fläche 8.9;30
+2;GND;Polklemme 4 mm, isoliert;-158;18.0;Ø6.5;20
+3;TRIGGER IN;Klinke 3,5 mm Einbau (Lumberg 1503 09 o. ä.);-138;18.0;Ø6.2;20
+4;OUT;Klinke 3,5 mm Einbau;-122;18.0;Ø6.2;20
+5;R;Cinch Einbau isoliert, Wand ≤ 5 mm;-80;18.0;Ø10.0;28
+6;L;Cinch Einbau isoliert;-40;18.0;Ø10.0;28
+7;AES/EBU;Neutrik NC3FD-L-1 (XLR-Buchse);10;18.0;Ø24 + 2× M3 diagonal 19×24;35
+8;COAX 1;Cinch Einbau isoliert;55;18.0;Ø10.0;28
+9;COAX 2;BNC 75 Ω Einbau isoliert;85;18.0;Ø9.7;28
+10;AC IN ~;Kaltgeräte C14 mit Sicherung, Schraubbef. 40 mm;-165;-22.0;27.8×20.0 + 2× Ø3,2 Abst. 40;40
+11;SVC (LAN);Neutrik NE8FDP (RJ45-Durchführung → Pi 5);-120;-22.0;Ø24 + 2× M3 diagonal 19×24;45
+12;R;Neutrik NC3MD-L-1;-80;-22.0;Ø24 + 2× M3 diagonal 19×24;35
+13;L;Neutrik NC3MD-L-1;-40;-22.0;Ø24 + 2× M3 diagonal 19×24;35
+14;OPTICAL;Toslink-Einbaubuchse mit Kabel (Typ festlegen);10;-22.0;10.5×10.5 + 2× M3 Abst. 20;30
+15;I2S;Neutrik NAHDMI-W-B (HDMI-Durchführung);55;-22.0;Ø24 + 2× M3 diagonal 19×24;45
+16;USB;Neutrik NAUSB-W-B (USB-B-Durchführung);95;-22.0;Ø24 + 2× M3 diagonal 19×24;45

@@ -14,6 +14,9 @@
 | Steuerung | RP2040 als Master, Pi 5 nur Renderer + Displays (UART/JSON) | Bedienung unabhängig vom Pi-Boot |
 | Eigenentwicklung | nur Steuerplatine, Tasterplatine, Knopfplatine | DAC-/Mixed-Signal-Layout zu riskant für Eigenbau |
 | Testaufbau | Front vor der DAC-Bestellung testen | Displays/Optik/Knopf sind unabhängig vom DAC |
+| Rückwand | Anordnung wie Original (Handbuch-Reihenfolge, 2 Reihen); nur Einbaubuchsen mit kurzen Kabeln, Neutrik D-Serie für XLR/AES/HDMI/USB/RJ45; E-T-A 1658 als Breaker + C14 mit Sicherung; Gravur nach Eloxal | unabhängig von DAC-Variante A/B, einheitliche Ausschnitte |
+| Rückwand: nicht umgesetzt | SFP-USB, EXT. CLOCK 10 MHz (Schalter `REAR_EXT_CLOCK`) | im Modul-Stack keine Funktion |
+| COAX 2 (BNC), AES/EBU | Relais-Umschaltung auf den Coax-Eingang der ReceiverPi DDC II, AES über Übertrager 110→75 Ω, RP2040 schaltet | DDC II hat nur einen S/PDIF-Eingang |
 
 ## Offen
 
@@ -25,6 +28,8 @@
 | Fronthöhe | 88 mm; Original-Front evtl. niedriger | nach Displaytest prüfen |
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
+| Innenraum hinten | Buchsenkörper ragen 20–45 mm nach innen; Platzpläne kollidieren (Ausgabe `platzplan*.py`) | Innenlayout nach DAC-Entscheidung neu: Platinen ≥ 48 mm hinter der Rückwand-Innenseite |
+| Rückwand-Positionen | aus Handbuch-Reihenfolge abgeleitet, kein Maßfoto | mit Foto der Original-Rückseite abgleichen; Cinch/BNC/Klinke/Toslink/IEC-Ausschnitte gegen Datenblatt |
 
 ## Bezug Kernbauteile (Stand 11/2026, Variante AK-Eigenbau – nur falls doch eigene DAC-Platine)
 

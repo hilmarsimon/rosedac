@@ -12,7 +12,6 @@ cq.exporters.export(cover, f"{OUT}/RD160_Deckel.step")
 cq.exporters.export(f.make_bottom(), f"{OUT}/RD160_Bodenplatte.step")
 cq.exporters.export(f.make_side_panel(1), f"{OUT}/RD160_Seitenteil_rechts.step")
 cq.exporters.export(f.make_side_panel(-1), f"{OUT}/RD160_Seitenteil_links.step")
-cq.exporters.export(f.make_rear_panel(), f"{OUT}/RD160_Rueckwand_Kontur.step")
 
 side_len = f.FL_Z0 - f.Z_REAR
 asm = (cq.Assembly()

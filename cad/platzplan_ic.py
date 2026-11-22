@@ -61,6 +61,12 @@ for name, g, x0, x1, z0, z1, h, rund in PARTS:
 for hn, hp in housing.items():
     asm.add(hp, name=hn.replace(" ", "_").replace("ü", "ue"), color=cq.Color(0.6, 0.6, 0.62, 0.4))
 asm.save(f"{OUT}/RD160_Platzplan_Variante_IC.step")
+for bk, bs in f.make_rear_connectors().items():      # Buchsenkörper hinter der Rückwand
+    asm.add(bs, name="Buchse_" + bk, color=cq.Color(0.85, 0.7, 0.3))
+    for name, g, x0, x1, z0, z1, h, rund in PARTS:
+        v = solid(x0, x1, z0, z1, h, rund).intersect(bs).val().Volume()
+        if v > 1e-3:
+            hits.append((name.split("\n")[0], "Buchse " + bk, round(v, 1)))
 print("Kollisionen:", hits or "keine")
 
 # ---------------- Zeichnung (Draufsicht, Front unten) ----------------

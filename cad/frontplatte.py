@@ -301,6 +301,40 @@ REAR_SCREW_U = SIDE_T + BEAD_W / 2     # Rückwandschrauben axial, Mitte Wulst 9
 COVER_SCREW_Z = Z_REAR + RP_T + 12.0   # frei von den axialen Rückwandgewinden (7 tief)
 REAR_SCREW_Y = H / 2 - COVER_T - BEAD_H / 2   # Rückwandschrauben axial in die Wulst (Foto Rückseite: an den Ecken)
 
+# ---------------- Rückwand: Anschlüsse ----------------
+# Reihenfolge wie Original (Handbuch, Rückansicht v. l. n. r.): oben BREAKER, GND, TRIGGER, UNBALANCED, AES/EBU, COAX,
+# EXT. CLOCK; unten AC IN, SVC, OPTICAL, BALANCED, I2S, USB, SFP. Alle Buchsen als Einbaubuchsen mit kurzen Kabeln
+# (unabhängig von DAC-Variante A/B). Koordinaten Rückansicht: v = -x (v nach rechts beim Blick auf die Rückwand), y wie Gerät.
+RP_Y_O, RP_Y_U = 18.0, -22.0          # Reihenmitte oben / unten
+RP_TXT = 2.5                          # Schrifthöhe Gravur
+REAR_EXT_CLOCK = False                # 10-MHz-Eingang: FifoPi Q7 nimmt keinen 10-MHz-Referenztakt → entfällt
+D_HOLE, D_SCR = 24.0, (9.5, 12.0)     # Neutrik D-Serie: Ø24, 2x M3 diagonal (+9,5|+12) (-9,5|-12)
+# key, Gravur, Typ, v, y, Maße (Typ-abhängig), Körper hinter der Wand (b, h, Tiefe inkl. Stecker/Kabel), Bauteil
+RP_CONN = [
+    ("BRK", "BREAKER", "dflat", -180, RP_Y_O, (9.6, 8.9), (14, 32, 30), "E-T-A 1658-G21-02-P10-2A (Gewinde 3/8-27, D-Fläche)"),
+    ("GND", "GND", "rund", -158, RP_Y_O, (6.5,), (12, 12, 20), "Polklemme 4 mm, isoliert"),
+    ("TRI", "TRIGGER IN", "rund", -138, RP_Y_O, (6.2,), (10, 12, 20), "Klinke 3,5 mm Einbau (Lumberg 1503 09 o. ä.)"),
+    ("TRO", "OUT", "rund", -122, RP_Y_O, (6.2,), (10, 12, 20), "Klinke 3,5 mm Einbau"),
+    ("RCA_R", "R", "rund", -80, RP_Y_O, (10.0,), (16, 16, 28), "Cinch Einbau isoliert, Wand ≤ 5 mm"),
+    ("RCA_L", "L", "rund", -40, RP_Y_O, (10.0,), (16, 16, 28), "Cinch Einbau isoliert"),
+    ("AES", "AES/EBU", "neutrik_d", 10, RP_Y_O, (), (26, 31, 35), "Neutrik NC3FD-L-1 (XLR-Buchse)"),
+    ("COX1", "COAX 1", "rund", 55, RP_Y_O, (10.0,), (16, 16, 28), "Cinch Einbau isoliert"),
+    ("COX2", "COAX 2", "rund", 85, RP_Y_O, (9.7,), (14, 14, 28), "BNC 75 Ω Einbau isoliert"),
+    ("IEC", "AC IN ~", "iec", -165, RP_Y_U, (27.8, 20.0, 40.0), (30, 24, 40), "Kaltgeräte C14 mit Sicherung, Schraubbef. 40 mm"),
+    ("SVC", "SVC (LAN)", "neutrik_d", -120, RP_Y_U, (), (26, 31, 45), "Neutrik NE8FDP (RJ45-Durchführung → Pi 5)"),
+    ("XLR_R", "R", "neutrik_d", -80, RP_Y_U, (), (26, 31, 35), "Neutrik NC3MD-L-1"),
+    ("XLR_L", "L", "neutrik_d", -40, RP_Y_U, (), (26, 31, 35), "Neutrik NC3MD-L-1"),
+    ("OPT", "OPTICAL", "rect", 10, RP_Y_U, (10.5, 10.5, 20.0), (16, 14, 30), "Toslink-Einbaubuchse mit Kabel (Typ festlegen)"),
+    ("I2S", "I2S", "neutrik_d", 55, RP_Y_U, (), (26, 31, 45), "Neutrik NAHDMI-W-B (HDMI-Durchführung)"),
+    ("USB", "USB", "neutrik_d", 95, RP_Y_U, (), (26, 31, 45), "Neutrik NAUSB-W-B (USB-B-Durchführung)"),
+]
+if REAR_EXT_CLOCK:
+    RP_CONN += [("CLK_S", "50 Ω", "rund", 140, RP_Y_O, (6.5,), (10, 10, 25), "SMA Einbau"),
+                ("CLK_B", "75 Ω", "rund", 165, RP_Y_O, (9.7,), (14, 14, 28), "BNC Einbau")]
+RP_GROUPS = [  # Gruppenbeschriftung (Gravur) über/unter mehreren Buchsen: Text, v_von, v_bis, y
+    ("UNBALANCED", -80, -40, RP_Y_O), ("BALANCED", -80, -40, RP_Y_U),
+]
+
 
 def cover_screw_points():
     return [(sx * (W / 2 - COVER_SCREW_U), COVER_SCREW_Z) for sx in (1, -1)]
@@ -429,8 +463,42 @@ def make_side_stub(sx, length=70.0):
     return cq.Workplane("XY").add(p.val().Solids()[0])
 
 
+def rp_holes(c):
+    """2D-Löcher einer Anschlussposition: Liste von ('kreis', v, y, d) | ('dflat', v, y, d, flach) | ('rechteck', v, y, b, h)."""
+    key, txt, typ, v, y, m, body, part = c
+    if typ == "rund":
+        return [("kreis", v, y, m[0])]
+    if typ == "dflat":
+        return [("dflat", v, y, m[0], m[1])]
+    if typ == "neutrik_d":
+        du, dy = D_SCR
+        return [("kreis", v, y, D_HOLE), ("kreis", v + du, y + dy, 2.5), ("kreis", v - du, y - dy, 2.5)]  # M3 Gewinde
+    if typ == "iec":
+        b, h, a = m
+        return [("rechteck", v, y, b, h), ("kreis", v - a / 2, y, 3.2), ("kreis", v + a / 2, y, 3.2)]
+    if typ == "rect":
+        b, h, a = m
+        return [("rechteck", v, y, b, h), ("kreis", v - a / 2, y, 2.5), ("kreis", v + a / 2, y, 2.5)]
+    raise ValueError(typ)
+
+
+def _hole_solid(h):
+    z0, L = Z_REAR - 0.1, RP_T + 0.2
+    x, y = -h[1], h[2]                                 # Rückansicht v → Geräte-x
+    if h[0] == "kreis":
+        return cq.Solid.makeCylinder(h[3] / 2, L, cq.Vector(x, y, z0), cq.Vector(0, 0, 1))
+    if h[0] == "rechteck":
+        return cq.Workplane("XY").workplane(offset=z0).center(x, y).rect(h[3], h[4]).extrude(L).edges("|Z").fillet(0.5).val()
+    if h[0] == "dflat":                                 # Ø d mit einer Fläche (Abstand flach von der Gegenseite)
+        d, fl = h[3], h[4]
+        c = cq.Workplane("XY").workplane(offset=z0).center(x, y).circle(d / 2).extrude(L)
+        cut = cq.Workplane("XY").box(d, d, L + 1, centered=(True, False, False)).translate((x, y - d / 2 + fl, z0 - 0.5))
+        return c.cut(cut).val()
+    raise ValueError(h[0])
+
+
 def make_rear_panel():
-    """Rückwand (nur Kontur + 4 Senkbohrungen): zwischen den Seitenteil-Wänden, hinter den Wulsten."""
+    """Rückwand 4 mm zwischen den Seitenteil-Wänden, hinter den Wulsten: 4 Senkbohrungen + Anschlussausschnitte (RP_CONN)."""
     yT, yB = H / 2 - COVER_T, -H / 2 + BOT_T
     r = (cq.Workplane("XY").box(W - 2 * SIDE_T - 0.2, yT - yB, RP_T, centered=(True, True, False))
          .translate((0, (yT + yB) / 2, Z_REAR)))
@@ -439,7 +507,18 @@ def make_rear_panel():
             x, y = sx * (W / 2 - REAR_SCREW_U), sy * REAR_SCREW_Y
             r = r.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.7, RP_T + 0.2, cq.Vector(x, y, Z_REAR - 0.1), cq.Vector(0, 0, 1))))
             r = r.cut(cq.Workplane("XY").add(cq.Solid.makeCone(3.3, 1.5, 1.8, cq.Vector(x, y, Z_REAR - 0.01), cq.Vector(0, 0, 1))))
-    return r
+    tools = [_hole_solid(h) for c in RP_CONN for h in rp_holes(c)]
+    r = r.cut(cq.Workplane("XY").add(cq.Compound.makeCompound(tools)))
+    return cq.Workplane("XY").add(r.val().Solids()[0])
+
+
+def make_rear_connectors():
+    """Platzhalter der Buchsenkörper hinter der Rückwand (für Kollisionsprüfung/Platzplan): {key: Workplane}."""
+    out = {}
+    for c in RP_CONN:
+        key, v, y, (b, h, d) = c[0], c[3], c[4], c[6]
+        out[key] = cq.Workplane("XY").box(b, h, d, centered=(True, True, False)).translate((-v, y, Z_REAR + RP_T + 0.05))
+    return out
 
 
 def tab_screw_points():
@@ -600,6 +679,8 @@ if __name__ == "__main__":
     chk = {"Rahmen": frame, "Seitenteil_r": make_side_panel(1), "Seitenteil_l": make_side_panel(-1),
            "Deckel": make_cover(), "Boden": make_bottom(), "Rueckwand": make_rear_panel(),
            "Schaum": make_foam(), "Schrauben": make_tab_screws()}
+    _bu = list(make_rear_connectors().values())
+    chk["Buchsen"] = cq.Workplane("XY").add(cq.Compound.makeCompound([b.val() for b in _bu]))
     ks = list(chk)
     for i in range(len(ks)):
         for j in range(i + 1, len(ks)):
