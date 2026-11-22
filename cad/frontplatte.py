@@ -159,7 +159,7 @@ def _front_body(front_pocket=False):
     # Ober-/Unterkante: Flansch nach hinten, Lippe + Schlitz (oben) bzw. Auflage (unten), Eckschrauben
     zb = T - BAND                                  # Rückseite Band
     ix = W / 2 - END_W
-    for sy, seat in ((1, SEAT_D), (-1, BOT_T)):
+    for sy, seat in ((1, SEAT_D),):          # nur oben: Bodenblech ist ein Rechteck und stößt hinten an die Front
         p = p.union(cq.Workplane("XY").box(W, FL_H, -FL_Z0, centered=(True, True, False))
                     .translate((0, sy * (H / 2 - FL_H / 2), FL_Z0)))
         # Auflage hinter dem Band: oben Deckel + Schaumstoff, unten Bodenplatte
@@ -168,7 +168,7 @@ def _front_body(front_pocket=False):
     p = p.cut(_groove_tool())
 
     # Innenecken der Auflage (Band-Rückseite / Seitenwand) senkrecht ausgerundet SEAT_R (Fräserradius, wie Original)
-    for sy, seat in ((1, SEAT_D), (-1, BOT_T)):
+    for sy, seat in ((1, SEAT_D),):          # nur oben: Bodenblech ist ein Rechteck und stößt hinten an die Front
         for sx in (1, -1):
             blk = (cq.Workplane("XY").box(SEAT_R, seat, SEAT_R, centered=(False, True, False))
                    .translate((sx * ix - (SEAT_R if sx > 0 else 0), sy * (H / 2 - seat / 2), zb - SEAT_R)))
@@ -271,7 +271,7 @@ def _bezel_corner_blocks(clr):
     zb, ix = T - BAND, W / 2 - END_W
     out = []
     for sx in (1, -1):
-        for y0, y1 in ((RAB_Y, H / 2), (-H / 2, -H / 2 + BOT_T)):
+        for y0, y1 in ((RAB_Y, H / 2),):
             h = y1 - y0 + 2 * clr
             blk = (cq.Workplane("XY").box(SEAT_R + clr, h, SEAT_R + clr, centered=(False, False, False))
                    .translate((sx * ix - (SEAT_R + clr if sx > 0 else 0), y0 - clr, zb - SEAT_R - clr)))
@@ -531,10 +531,20 @@ def make_cover():
     return c
 
 
+BOT_GAP = 0.3                          # Bodenblech vorn: Fuge zur Front-Rückseite
+BOT_FRONT_Z = FL_Z0 - TAB_L - 8.0      # vordere Bodenschrauben in der unteren Wulst, hinter der Laschentasche
+
+
+def bot_front_points():
+    return [(sx * (W / 2 - COVER_SCREW_U), BOT_FRONT_Z) for sx in (1, -1)]
+
+
 def make_bottom():
-    """Bodenblech 1 mm: volle Breite, vorn in der Auflage der Front, hinten 2x ISO 7380 M3x6 in die Wulst."""
-    b = _plate(False, FL_Z0 - 0.3 - Z_REAR, False)
-    for x, z in cover_screw_points() + ql_fix_points():   # 1 mm Blech: Ø3,4 für ISO 7380 M3x6 (Linsenkopf)
+    """Bodenblech 1 mm, Rechteck W x Länge (keine Frontzone, keine Rundung): von der Rückseite bis an die Front-Rückseite,
+    unter Seitenwänden und Rückwand, außen bündig. ISO 7380 M3x6: 2 vorn + 2 hinten in die Wulst, 3 in die Querleiste."""
+    L = FL_Z0 - BOT_GAP - Z_REAR
+    b = cq.Workplane("XY").box(W, BOT_T, L, centered=(True, False, False)).translate((0, -H / 2, Z_REAR))
+    for x, z in cover_screw_points() + ql_fix_points() + bot_front_points():   # Ø3,4 für ISO 7380 M3x6 (Linsenkopf)
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.7, BOT_T + 0.2, cq.Vector(x, -H / 2 - 0.1, z), cq.Vector(0, 1, 0))))
     return b
 
@@ -597,8 +607,9 @@ def make_side_panel(sx):
                                                                    cq.Vector(0, 1, 0))))
             p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(3.25, 3.0, cq.Vector(xc, yf - BEAD_H - 0.01, COVER_SCREW_Z),
                                                                    cq.Vector(0, 1, 0))))
-        else:        # Bodenblech: Gewinde M3 von unten
-            p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.25, 7.0, cq.Vector(xc, yf, COVER_SCREW_Z), cq.Vector(0, 1, 0))))
+        else:        # Bodenblech: Gewinde M3 von unten, hinten und vorn
+            for zz in (COVER_SCREW_Z, BOT_FRONT_Z):
+                p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.25, 7.0, cq.Vector(xc, yf, zz), cq.Vector(0, 1, 0))))
     # Mittelblock hinten (Wulstbreite) für die seitliche Rückwandschraube, Gewinde M3 axial 7 tief
     xb = sx * (W / 2 - SIDE_T - BEAD_W / 2)
     p = p.union(cq.Workplane("XY").box(BEAD_W + 0.2, SIDE_BOSS_H, SIDE_BOSS_D, centered=(True, True, False))

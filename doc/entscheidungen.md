@@ -8,6 +8,7 @@
 | Gehäusehöhe | H = 78 mm ohne Füße (Original laut Front-/Rückseitenfoto ca. 74 + ca. 9 mm Füße; Datenblatt 88 inkl. Füße) | +4 mm, damit die DFR0524 (71 mm) passen; Alternative 6,52" AMOLED PO652F2K bei H = 74 verworfen (Kosten, Board offen) |
 | Front | zweiteilig: Blende (Alu, Lippe 1,5 + Fase 0,4, Rand 4, Wände 2,5, Ecken hinter dem Band) + Träger (Alu, Displaytasche, Taster, Knopflager, Flansche, Laschen); Plexiglas 424,4 × 72,4 × 3 von hinten eingelegt, 1,2 unter der Lippe, 0,3 Dehnspalt, über Poron geklemmt, nicht geklebt | keine sichtbare Fuge Platte/Rahmen; Frontdicke T = 13,5 (Plattenfront 1,5 zurückgesetzt) |
 | Blende ↔ Träger | 6× M2,5 Senkkopf von unten (Unterseite, unsichtbar); oben hält der Ring über die Seitenwände, Deckelfeder drückt von unten an den Nutsteg der Blende | oben keine sichtbaren Schrauben möglich (Platte muss von hinten durch) |
+| Bodenblech | Rechteck 430 × 307,7 × 1, stößt hinten an die Front (0,3 Fuge), Front unten ohne Auflage; 7× ISO 7380 M3×6 (2 vorn + 2 hinten in die Wulst, 3 in die Querleiste) | einfacher, unten nicht sichtbar |
 | Testfront | bleibt einteilig, Platte von vorn in Fenstergröße 1,5 zurückgesetzt (Fuge dort sichtbar) | nur Optik-/Funktionstest |
 | Deckelnut/Feder | nur links und rechts der Displaytasche (zwei Abschnitte mit Fräserauslauf) | bei H = 78 reicht die Displaytasche bis y 36, Nut läge darin |
 | Front-Abdeckung | Plexiglas vollflächig, Musterplatten 9H04 SC und 7H25 GT im Test vergleichen | Dead-Front-Optik wie Original |
