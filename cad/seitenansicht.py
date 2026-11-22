@@ -69,11 +69,11 @@ txt = (f"Verhältnisse Nachbau\n"
        f"Konus: Ø{f.CONE_LIP_ID:.0f} vorn → Ø{f.CONE_FLOOR_D:.0f} in Frontebene\n\n"
        f"Vergleich mit den Produktfotos (gemessen in Pixeln)\n"
        f"Knopf-Ø / Frontbreite     ≈ 0,12   → Knopf ≈ 51 mm  ✓\n"
-       f"Knopf-Ø / Fronthöhe       ≈ 0,72   (Nachbau 0,57)   ✗\n"
+       f"Knopf-Ø / Fronthöhe       ≈ 0,72   (Nachbau {r1:.2f})\n"
        f"Überstand / Knopf-Ø       ≈ 0,23 (Draufsicht-Foto: ca. 11,5 mm)\n\n"
-       f"Folgerung: Überstand 12 mm; Front ist zu hoch.\n"
-       f"Die 88 mm aus dem Test sind die Gerätehöhe inkl. Füße;\n"
-       f"die Front des Originals ist etwa 51 / 0,72 ≈ 70 mm hoch.")
+       f"Folgerung: Überstand 12 mm. Original-Korpus ca. 70–74 mm\n"
+       f"(88 mm Datenblatt inkl. Füße). Nachbau H = {H:.0f} mm, damit\n"
+       f"die DFR0524 (71 mm) hineinpassen (+4 mm zum Original).")
 fig.text(0.50, 0.93, txt, fontsize=10.5, va="top", family="DejaVu Sans Mono")
 
 # 3D-Ansichten einsetzen

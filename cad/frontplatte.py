@@ -13,7 +13,7 @@ Display: 2x DFRobot DFR0524 5,5" AMOLED 1080x1920 (HDMI), quer nebeneinander,
 import cadquery as cq
 
 # ---------------- Rahmen / Träger ----------------
-W, H, T = 430.0, 88.0, 12.0           # Außenmaß, Gesamtdicke
+W, H, T = 430.0, 78.0, 12.0           # Außenmaß (Korpus ohne Füße; Fotos: ca. 74 + Füße, 78 wegen DFR0524), Gesamtdicke
 FRAME_B = 4.0                         # sichtbarer Alu-Rand
 FRAME_R = 2.0                         # Innenradius Fronttasche
 EDGE_CHAMFER = 0.5
@@ -73,6 +73,7 @@ DISP_X = 0.0
 PNL_W = DISP_W + 2 * DISP_CLR
 PNL_H = DISP_H + 2 * DISP_CLR
 PNL_DEPTH = CARRIER_T                 # von hinten bis an die Plexiglasplatte
+GROOVE_X0 = PNL_W / 2 + 4.0           # Deckelnut/Feder nur außerhalb der Displaytasche (H = 78: Tasche reicht bis y 36)
 
 # ---------------- Taster (2 x 5) ----------------
 BTN_X0, BTN_PITCH_X = -198.0, 13.0
@@ -96,7 +97,7 @@ SHAFT_HOLE_D = 30.0                   # Bund Ø28 + O-Ring 26x2 (Laufbohrung)
 SHAFT_PANEL_D = 51.0                  # Knopfboden sitzt in der Platte
 
 # ---------------- Einschalttaster ----------------
-PWR_X, PWR_Y = 196.0, 27.0
+PWR_X, PWR_Y = 196.0, 22.0             # 13 mm unter Fensteroberkante, Schalterkörper frei vom Flansch
 PWR_D, PWR_HOLE_D, PWR_PANEL_D = 12.0, 12.2, 12.6
 PWR_CB_D, PWR_CB_DEPTH = 16.0, 5.0
 
@@ -104,8 +105,8 @@ PWR_CB_D, PWR_CB_DEPTH = 16.0, 5.0
 M3_TAP_D, M3_DRILL_DEPTH, M3_THREAD_DEPTH = 2.5, 7.0, 6.0
 M3_HOLES = {
     "Chassis":       [(-128, 0), (128, 0)],
-    "Taster-PCB":    [(x, sy * 31) for x in (-191, -153) for sy in (-1, 1)],   # y31: Abstandsbolzen frei vom Flansch (y35)
-    "LED/Encoder-PCB": [(KNOB_X - 30, 24), (KNOB_X - 30, -24), (KNOB_X + 22, -30), (KNOB_X + 6, 31)],
+    "Taster-PCB":    [(x, sy * 26) for x in (-191, -153) for sy in (-1, 1)],   # y26: Abstandsbolzen Ø5 frei vom Flansch (y30)
+    "LED/Encoder-PCB": [(KNOB_X - 30, 24), (KNOB_X - 30, -24), (KNOB_X + 22, -26), (KNOB_X + 8, 27)],
     "Panel-Klemmrahmen": [(sx * 127, sy * 25) for sx in (-1, 1) for sy in (-1, 1)],
 }
 
@@ -130,12 +131,16 @@ def make_frame():
     # Nut für die Deckelfeder in der Bandrückseite (zwischen den Seitenwänden, Enden mit Fräserauslauf R)
     import math
     run = math.sqrt(CUTTER_R ** 2 - (CUTTER_R - GROOVE_D) ** 2)  # Auslauflänge an der Rückseite
-    g = (cq.Workplane("XZ").workplane(offset=-(H / 2 - GROOVE_TOP))   # Ebene y = H/2 - GROOVE_TOP, Normale -Y
-         .center(0, zb).rect(2 * (ix - run), 2 * GROOVE_D).extrude(GROOVE_H))
-    for sx in (1, -1):
-        g = g.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(
-            CUTTER_R, GROOVE_H, cq.Vector(sx * (ix - run), H / 2 - GROOVE_TOP - GROOVE_H, zb + GROOVE_D - CUTTER_R),
-            cq.Vector(0, 1, 0))))
+    g = None
+    for sx in (1, -1):                         # zwei Nutabschnitte links/rechts der Displaytasche, je 2 Fräserausläufe
+        xa, xb = GROOVE_X0 + run, ix - run
+        seg = (cq.Workplane("XZ").workplane(offset=-(H / 2 - GROOVE_TOP)).center(sx * (xa + xb) / 2, zb)
+               .rect(xb - xa, 2 * GROOVE_D).extrude(GROOVE_H))
+        for xc in (xa, xb):
+            seg = seg.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(
+                CUTTER_R, GROOVE_H, cq.Vector(sx * xc, H / 2 - GROOVE_TOP - GROOVE_H, zb + GROOVE_D - CUTTER_R),
+                cq.Vector(0, 1, 0))))
+        g = seg if g is None else g.union(seg)
     p = p.cut(g.intersect(cq.Workplane("XY").box(2 * ix, H, zb + GROOVE_D - FL_Z0 + 1, centered=(True, True, False))
                           .translate((0, 0, FL_Z0 - 1))))
 
@@ -278,11 +283,12 @@ def _plate(top, length, tongue):
     front = front.edges("|Y and >Z").fillet(SEAT_R + 0.5)       # passt in die ausgerundeten Innenecken
     body = (cq.Workplane("XY").box(wb, t, length, centered=(True, True, False)).translate((0, yc, z_end - length)))
     p = front.union(body)
-    if tongue:
+    if tongue:                                 # zwei Federabschnitte passend zu den Nutabschnitten (je 1 mm kürzer)
         run = math.sqrt(CUTTER_R ** 2 - (CUTTER_R - GROOVE_D) ** 2)
-        wt = 2 * (W / 2 - END_W - run - 1.0)
-        p = p.union(cq.Workplane("XY").box(wt, TONGUE_T, TONGUE_L + 0.01, centered=(True, True, False))
-                    .translate((0, H / 2 - GROOVE_TOP - TONGUE_T / 2, zb - 0.3 - 0.01)))
+        xa, xb = GROOVE_X0 + run + 1.0, W / 2 - END_W - run - 1.0
+        for sx in (1, -1):
+            p = p.union(cq.Workplane("XY").box(xb - xa, TONGUE_T, TONGUE_L + 0.01, centered=(True, True, False))
+                        .translate((sx * (xa + xb) / 2, H / 2 - GROOVE_TOP - TONGUE_T / 2, zb - 0.3 - 0.01)))
     return p
 
 

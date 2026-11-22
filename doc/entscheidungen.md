@@ -5,6 +5,8 @@
 | Thema | Entscheidung | Grund |
 |---|---|---|
 | Display | 2× DFRobot DFR0524 5,5" AMOLED (HDMI) am Pi 5 | Größe passend zur Front, echtes Schwarz hinter Dead-Front |
+| Gehäusehöhe | H = 78 mm ohne Füße (Original laut Front-/Rückseitenfoto ca. 74 + ca. 9 mm Füße; Datenblatt 88 inkl. Füße) | +4 mm, damit die DFR0524 (71 mm) passen; Alternative 6,52" AMOLED PO652F2K bei H = 74 verworfen (Kosten, Board offen) |
+| Deckelnut/Feder | nur links und rechts der Displaytasche (zwei Abschnitte mit Fräserauslauf) | bei H = 78 reicht die Displaytasche bis y 36, Nut läge darin |
 | Front-Abdeckung | Plexiglas vollflächig, Musterplatten 9H04 SC und 7H25 GT im Test vergleichen | Dead-Front-Optik wie Original |
 | Rahmen-Oberfläche | Glasperlstrahlen + Eloxal schwarz | Originaloptik |
 | Deckelhalterung vorn | Nut im Band (Scheibenfräser), einseitige Feder am Deckel, Schaumstoff darunter | keine sichtbaren Schrauben |
@@ -25,14 +27,11 @@
 |---|---|---|
 | DAC | A: AckoDAC AKD49S (AK4191 + AK4499EX, 835 USD) · B: Ian Canada ES9038Q2M Dual Mono + I/V STD | A, wenn Acko I²C-Steuerung durch RP2040, Takt vom FifoPi, Maße und Versorgung bestätigt; sonst B |
 | Eingänge/Takt | Ian Canada ReceiverPi DDC II + FifoPi Q7 III | in beiden Varianten gesetzt |
-| Display (neu wegen Höhe ~74 mm) | A: 6,52" AMOLED PO652F2K 2520×840 (aktiv 157,2×52,4, Outline 159,5×54,4, MIPI → HDMI-Board Gesight/Panox) · B: 7,84" IPS 1280×400 (aktiv 190×59,5, Outline 205,8×68, Wisecoco ~49 $) · C: 8,8" IPS 1920×480 (aktiv 218,9×54,7, Outline 231,3×64,3) | A (echtes Schwarz wie Original, passt in 74 mm); B parallel als günstiger Optiktest. DFR0524 (71 mm hoch) passt nicht mehr. Original: ca. 200 mm breite AMOLED-Fläche |
 | Displaymodul-Dicke | Annahme 3 mm (`DISP_T` in `cad/testfront.py`) | am gewählten Display messen |
-| Fronthöhe | 88 mm; Original-Front evtl. niedriger | nach Displaytest prüfen |
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
 | Innenraum hinten | Buchsenkörper ragen 20–45 mm nach innen; Platzpläne kollidieren (Ausgabe `platzplan*.py`) | Innenlayout nach DAC-Entscheidung neu: Platinen ≥ 48 mm hinter der Rückwand-Innenseite |
 | Rückwand-Ausschnitte | Cinch/BNC/Klinke/Toslink/HDMI/USB/RJ45/IEC nach typischen Maßen | gegen Datenblatt der bestellten Teile prüfen |
-| Gehäusehöhe | Rückseitenfoto (Maßstab Breite 430): Korpus ca. 73 mm + Füße ca. 9 mm; wir haben H = 88 ohne Füße | Datenblatt 88 vermutlich inkl. Füße → mit zweiter Quelle prüfen, betrifft Front/Displays (DFR0524 71 mm hoch) |
 
 ## Bezug Kernbauteile (Stand 11/2026, Variante AK-Eigenbau – nur falls doch eigene DAC-Platine)
 

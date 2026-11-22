@@ -1,4 +1,4 @@
-"""Oberkante im Schnitt: (1) senkrecht bei X = 0 (Front, Auflage, Schaumstoff, Deckel),
+"""Oberkante im Schnitt: (1) senkrecht bei X = XS (Nutabschnitt) (Front, Auflage, Schaumstoff, Deckel),
 (2) quer durch die rechte Seite hinter der Front (Seitenteil-L, Deckel-L, Lasche, Schraube)."""
 import os
 import matplotlib; matplotlib.use("Agg")
@@ -38,10 +38,11 @@ def draw(ax, wp, name):
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(16.5, 5.2), gridspec_kw={"width_ratios": [1.25, 1]})
 lab = dict(fontsize=8.5, arrowprops=dict(arrowstyle="-", lw=0.4))
 
-# (1) Schnitt X = 0: Achse waagerecht = -Z (Front links), senkrecht = Y
+# (1) Schnitt X = XS im linken Nutabschnitt (über der Displaytasche keine Nut/Feder): Achse waagerecht = -Z, senkrecht = Y
+XS = -165.5                          # zwischen den Tastern, linker Nutabschnitt
 for name, wp in parts():
     try:
-        s = wp.rotate((0, 0, 0), (0, 1, 0), -90).section(0.0)       # X -> Z, Schnitt X = 0
+        s = wp.translate((-XS, 0, 0)).rotate((0, 0, 0), (0, 1, 0), -90).section(0.0)   # X -> Z, Schnitt X = XS
     except Exception:
         continue
     draw(a1, s, name)
@@ -59,7 +60,7 @@ a1.annotate(f"Feder einseitig {f.TONGUE_T:.0f} × {f.TONGUE_L}, oben um {f.GROOV
 a1.annotate("Plexiglas 3 mm", (-(T - 1.5), yt - 15), (-(T + 14), yt - 25), **lab)
 a1.set_aspect("equal"); a1.axis("off")
 a1.set_xlim(-(T + 16), -(z0 - 42)); a1.set_ylim(yt - 32, yt + 16)
-a1.set_title("① Oberkante, Schnitt bei X = 0 (Front links)", fontsize=10, loc="left")
+a1.set_title(f"① Oberkante, Schnitt bei X = {XS} (Nutabschnitt, Front links)", fontsize=10, loc="left")
 
 # (2) Querschnitt Z = Laschenschraube: Achse waagerecht = X, senkrecht = Y (Blick von vorn, rechte Seite)
 zc = f.TAB_SCREW_Z
