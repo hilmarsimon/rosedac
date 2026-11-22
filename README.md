@@ -30,7 +30,7 @@ Zentrale Parameter (Maße, Laschen, Deckel, Nut, Rippen, Knopf) stehen in `cad/f
 - **Gehäuse:** Seitenteile als C-Profil mit Rippen außen; Front ↔ Seitenteil über waagerechte Laschen + senkrechte M3-Senkschraube;
   Deckel 5 mm eben mit Feder in Nut im Band, Schaumstoff, Ziernut; hinten von unten verschraubt; Bodenblech 1 mm.
 - **Architektur:** Pi 5 (Renderer + Displays), RP2040 als Master (Bedienung, I²C/SPI zum DAC, UART zum Pi), 3 Ringkerne linear.
-- **DAC:** offen – Variante AK (AckoDAC AKD49S, AK4191 + AK4499EX) oder Variante Ian Canada (ES9038Q2M Dual Mono). Siehe `doc/entscheidungen.md`.
+- **DAC:** AckoDAC AKD49S (AK4191 + AK4499EX) mit Ian Canada ReceiverPi DDC II + FifoPi Q7 III; Eigenbau nur Steuer-, Taster-, Knopf- und Eingangsplatine. Siehe `doc/entscheidungen.md`, Platzplan `cad/platzplan.py`.
 - **Nächster Schritt:** Testaufbau Front (Displays, Plexiglas, Knopf) vor der DAC-Bestellung – `test/README.md`.
 
 ## Links (privat)

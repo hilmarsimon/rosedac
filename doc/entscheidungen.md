@@ -25,12 +25,13 @@
 
 | Thema | Optionen | Empfehlung / nächster Schritt |
 |---|---|---|
-| DAC | A: AckoDAC AKD49S (AK4191 + AK4499EX, 835 USD) · B: Ian Canada ES9038Q2M Dual Mono + I/V STD | A, wenn Acko I²C-Steuerung durch RP2040, Takt vom FifoPi, Maße und Versorgung bestätigt; sonst B |
+| DAC | **Entschieden 11/2026:** AckoDAC AKD49S (AK4191 + AK4499EX, I-V onboard, ±15 V) + Ian Canada ReceiverPi DDC II + FifoPi Q7 III (Reclocking, MCLK) + PurePi II; Eigenbau: Steuer-, Taster-, Knopfplatine, kleine Eingangsplatine (Relais-Mux Coax 1/2 + AES-Übertrager) | wenig Eigenentwicklung, AK4499EX-Klang; Variante IC-DAC (ES9038Q2M) verworfen |
+| Acko-Klärung | Platinenmaße/Bohrbild, Ströme ±15 V, I²S-Direkteingang + ext. MCLK (Pegel, Frequenz vom FifoPi), Ausgänge als Stiftleiste statt XLR/Cinch, I²C-API für RP2040 | Anfrage an Acko, Platzhalter 175 × 102 im Platzplan |
 | Eingänge/Takt | Ian Canada ReceiverPi DDC II + FifoPi Q7 III | in beiden Varianten gesetzt |
 | Displaymodul-Dicke | Annahme 3 mm (`DISP_T` in `cad/testfront.py`) | am gewählten Display messen |
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
-| Innenraum hinten | Buchsenkörper ragen 20–45 mm nach innen; Platzpläne kollidieren (Ausgabe `platzplan*.py`) | Innenlayout nach DAC-Entscheidung neu: Platinen ≥ 48 mm hinter der Rückwand-Innenseite |
+| Innenraum | Platzplan `cad/platzplan.py`: Netz/Trafos rechts, AKD49S mittig hinten zwischen den Ausgängen L/R, IC-Stapel rechts hinten, Pi 5 + Steuerung vorn links; Platinen ≥ 49 mm vor der Rückwand-Innenseite | keine Kollisionen (Gehäuse, Buchsen, Platzhalter untereinander) |
 | Rückwand-Ausschnitte | Cinch/BNC/Klinke/Toslink/HDMI/USB/RJ45/IEC nach typischen Maßen | gegen Datenblatt der bestellten Teile prüfen |
 
 ## Bezug Kernbauteile (Stand 11/2026, Variante AK-Eigenbau – nur falls doch eigene DAC-Platine)
