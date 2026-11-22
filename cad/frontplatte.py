@@ -42,6 +42,7 @@ TONGUE_L = GROOVE_D - 0.3             # Federlänge (Deckelstirn 0,3 vor dem Ban
 CUTTER_R = 10.0                       # Scheibenfräser Ø20: Auslauf an den Nutenden
 SEAT_R = 3.0                          # senkrechte Innenecken Auflage/Seitenwand (Fräser Ø6), Foto
 DECO_W, DECO_D = 0.6, 0.15            # Ziernut im Deckel: Breite, Tiefe (Foto); Lage siehe deco_rect()
+JOINT = DECO_W                        # Fuge Deckel/Boden ↔ Front ringsum = Ziernutbreite: eine durchgehende Linie
 BOT_T = 1.0                           # Bodenblech 1 mm (Auflage unten in der Front gleich tief)
 # Seitenteile (Detailfoto Innenecke): C-Profil = Wand SIDE_T + innen oben/unten Wulst BEAD_W x BEAD_H, Höhe
 # zwischen Deckel und Boden. Deckel (5 mm) und Bodenblech (1 mm) sind ebene Platten über die volle Breite W,
@@ -364,20 +365,20 @@ def _plate(top, length, tongue):
     t = COVER_T if top else BOT_T
     zb = T - BAND
     yc = sy * (H / 2 - t / 2)
-    wf = 2 * (W / 2 - END_W) - 1.0
+    wf = 2 * (W / 2 - END_W - JOINT)           # Fuge JOINT zu den Seitenwänden der Front
     wb = W                                     # ebene Platte über die Seitenwände, außen bündig
     z_end = FL_Z0 - 0.3
-    front = (cq.Workplane("XY").box(wf, t, zb - 0.3 - FL_Z0 + 0.31, centered=(True, True, False))
+    front = (cq.Workplane("XY").box(wf, t, zb - JOINT - FL_Z0 + 0.31, centered=(True, True, False))
              .translate((0, yc, FL_Z0 - 0.31)))
-    front = front.edges("|Y and >Z").fillet(SEAT_R + 0.5)       # passt in die ausgerundeten Innenecken
+    front = front.edges("|Y and >Z").fillet(SEAT_R - JOINT)     # konzentrisch zur Innenecke R SEAT_R: Fuge rundum JOINT
     body = (cq.Workplane("XY").box(wb, t, length, centered=(True, True, False)).translate((0, yc, z_end - length)))
     p = front.union(body)
     if tongue:                                 # zwei Federabschnitte passend zu den Nutabschnitten (je 1 mm kürzer)
         run = math.sqrt(CUTTER_R ** 2 - (CUTTER_R - GROOVE_D) ** 2)
         xa, xb = GROOVE_X0 + run + 1.0, W / 2 - END_W - run - 1.0
         for sx in (1, -1):
-            p = p.union(cq.Workplane("XY").box(xb - xa, TONGUE_T, TONGUE_L + 0.01, centered=(True, True, False))
-                        .translate((sx * (xa + xb) / 2, H / 2 - GROOVE_TOP - TONGUE_T / 2, zb - 0.3 - 0.01)))
+            p = p.union(cq.Workplane("XY").box(xb - xa, TONGUE_T, TONGUE_L + JOINT - 0.3 + 0.01, centered=(True, True, False))
+                        .translate((sx * (xa + xb) / 2, H / 2 - GROOVE_TOP - TONGUE_T / 2, zb - JOINT - 0.01)))
     return p
 
 
@@ -502,22 +503,21 @@ def cover_outline():
 
 
 def deco_rect():
-    """Mittellinie der Ziernut, Rechteck mit rechten Winkeln (Foto): vorn direkt am Stoß Deckel/Front (offen zur
-    Deckelstirn), seitlich in Flucht der Innenkante der Front-Seitenwände, nach hinten auslaufend (keine Querlinie)."""
-    zf = T - BAND - 0.3
-    u = END_W + 0.5 + DECO_W / 2                  # 11,8 mm von der Außenkante
-    return (-(W / 2 - u), W / 2 - u, Z_REAR + u, zf - DECO_W / 2)
+    """Ziernut = Verlängerung der Fuge Deckel/Seitenwand der Front nach hinten: zwei gerade Linien in Flucht der
+    Seitenwand-Innenkante (|x| = W/2 - END_W - JOINT .. W/2 - END_W), vom Ende der Frontzone bis hinten offen.
+    Vorn und an den Ecken bildet die Fuge (JOINT = DECO_W) selbst die Linie. Rückgabe: x innen, x außen, z hinten, z vorn."""
+    return (W / 2 - END_W - JOINT, W / 2 - END_W, Z_REAR, FL_Z0 - 0.3)
 
 
 def make_deco_groove():
-    """Ziernut DECO_W breit, DECO_D tief, als Rechteckrahmen mit scharfen Ecken."""
-    x0, x1, z0, z1 = deco_rect()
-    h = DECO_W / 2
-    def box(xa, xb, za, zb_):
-        return (cq.Workplane("XY").box(xb - xa, DECO_D + 0.01, zb_ - za, centered=False)
-                .translate((xa, H / 2 - DECO_D, za)))
-    zr = Z_REAR - 1.0                              # hinten keine Querlinie: Seitenlinien laufen nach hinten aus
-    return box(x0 - h, x1 + h, zr, z1 + h + 1.0).cut(box(x0 + h, x1 - h, zr - 1.0, z1 - h))   # vorn zur Stirn offen
+    """Ziernut DECO_W breit, DECO_D tief: nur die beiden Seitenlinien, hinten offen auslaufend."""
+    xi, xa, zr, zv = deco_rect()
+    g = None
+    for sx in (1, -1):
+        b = (cq.Workplane("XY").box(xa - xi, DECO_D + 0.01, zv - zr + 2.0, centered=(False, False, False))
+             .translate((xi if sx > 0 else -xa, H / 2 - DECO_D, zr - 1.0)))
+        g = b if g is None else g.union(b)
+    return g
 
 
 def make_cover():

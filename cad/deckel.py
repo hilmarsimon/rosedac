@@ -44,9 +44,9 @@ subprocess.run(["convert", "/tmp/geh_iso.png", "-trim", "-rotate", "90", "-borde
 # ---------------- Zeichnung ----------------
 W, T = f.W, f.T
 zb = T - f.BAND
-zf = zb - 0.3                       # Deckelstirn
+zf = zb - f.JOINT                    # Deckelstirn
 run = math.sqrt(f.CUTTER_R ** 2 - (f.CUTTER_R - f.GROOVE_D) ** 2)
-wf = 2 * (W / 2 - f.END_W) - 1.0
+wf = 2 * (W / 2 - f.END_W - f.JOINT)
 wl = W                                  # volle Breite über die Seitenteile
 wt = 2 * (W / 2 - f.END_W - run - 1.0)
 z1 = f.FL_Z0                         # Ende Frontbereich (Absatz)
@@ -60,12 +60,16 @@ ax = fig.add_axes([0.03, 0.30, 0.62, 0.64]); ax.set_aspect("equal"); ax.axis("of
 outline = [(-wf / 2, V(zf)), (wf / 2, V(zf)), (wf / 2, V(z1 - 0.3)), (wl / 2, V(z1 - 0.3)), (wl / 2, V(zr)),
            (-wl / 2, V(zr)), (-wl / 2, V(z1 - 0.3)), (-wf / 2, V(z1 - 0.3))]
 ax.add_patch(Polygon(outline, closed=True, fc="#e4e6ea", ec="k", lw=1.0))
-ax.add_patch(Rectangle((-wt / 2, -f.TONGUE_L), wt, f.TONGUE_L, fc="#c9ccd1", ec="k", lw=0.8))      # Feder
-_x0, _x1, _z0, _z1 = f.deco_rect()
-_gp = [(_x0, V(f.Z_REAR)), (_x0, V(_z1)), (_x1, V(_z1)), (_x1, V(f.Z_REAR))]
-ax.plot([p[0] for p in _gp], [p[1] for p in _gp], color="#b03030", lw=0.8)
-ax.annotate(f"Ziernut rechtwinklig {f.DECO_W} breit, {f.DECO_D} tief: vorn am Stoß zur Front,\nseitlich {f.W / 2 - f.deco_rect()[1]:.1f} von der Kante, läuft hinten aus",
-            (-60, V(_z1)), (-200, V(f.Z_REAR) - 60), fontsize=8.5, color="#b03030",
+_fa, _fb = f.GROOVE_X0 + run + 1.0, W / 2 - f.END_W - run - 1.0      # Feder: zwei Abschnitte neben der Displaytasche
+_tl = f.TONGUE_L + f.JOINT - 0.3
+for _s in (1, -1):
+    ax.add_patch(Rectangle((min(_s * _fa, _s * _fb), -_tl), _fb - _fa, _tl, fc="#c9ccd1", ec="k", lw=0.8))
+_xi, _xa, _zr, _zv = f.deco_rect()
+for _s in (1, -1):
+    ax.add_patch(Rectangle((_s * (_xi + _xa) / 2 - f.DECO_W / 2, V(_zv)), f.DECO_W, V(_zr) - V(_zv), fc="#b03030", ec="#b03030", lw=0.6))
+ax.annotate(f"Ziernut {f.DECO_W} breit, {f.DECO_D} tief, in Flucht der Fuge zur Front-Seitenwand\n"
+            f"({f.W / 2 - _xa:.0f}..{f.W / 2 - _xi:.1f} von der Kante), gerade, läuft hinten offen aus. Vorn bildet die Fuge {f.JOINT} die Linie.",
+            (_xi, V(_zv) + 40), (-200, V(f.Z_REAR) - 60), fontsize=8.5, color="#b03030",
             arrowprops=dict(arrowstyle="-", lw=0.4, color="#b03030"))
 for x, z in f.cover_screw_points():
     ax.add_patch(Circle((x, V(z)), 1.25, fc="none", ec="k", lw=0.7, ls="--"))
@@ -84,7 +88,7 @@ def dim_v(x, y0, y1, txt):
 
 dim_h(-wl / 2, wl / 2, V(zr) + 14, f"{wl:.1f} (volle Breite, liegt auf den Seitenteilen, außen bündig)")
 dim_h(-wf / 2, wf / 2, -14, f"{wf:.1f} (vorn zwischen den Seitenwänden der Front)")
-dim_h(-wt / 2, wt / 2, -26, f"Feder {wt:.1f} × {f.TONGUE_L} × {f.TONGUE_T:.0f} (oben {f.GROOVE_TOP:.0f} abgesetzt)")
+dim_h(_fa, _fb, -26, f"Feder 2× {_fb - _fa:.1f} × {_tl:.1f} × {f.TONGUE_T:.0f} (oben {f.GROOVE_TOP:.0f} abgesetzt)")
 dim_v(wl / 2 + 8, 0, V(zr), f"{L:.1f} ohne Feder")
 dim_v(wl / 2 + 22, 0, V(z1 - 0.3), f"{V(z1 - 0.3):.1f}")
 x, z = f.cover_screw_points()[0]
@@ -149,9 +153,9 @@ notes = [
     f"FERTIGUNG DECKEL (Bodenblech {f.BOT_T:.0f} mm: gleiche Kontur ohne Feder, 2× Ø3,4 für ISO 7380 M3×6)",
     f"1. EN AW-6061-T6 Platte 5 mm, Zuschnitt {wl:.1f} × {L + f.TONGUE_L:.1f} (inkl. Feder). Planheit ≤ 0,2.",
     "2. Ebene Platte, keine Absätze an den Längsseiten; Kanten oben Fase 0,3.",
-    f"3. Vorn: Eckausklinkungen {(wl - wf) / 2:.1f} × {V(z1 - 0.3):.1f}; Feder {wt:.1f} breit, oben {f.GROOVE_TOP:.0f} abgesetzt, {f.TONGUE_L} lang.",
+    f"3. Vorn: Eckausklinkungen {(wl - wf) / 2:.1f} × {V(z1 - 0.3):.1f}; Feder 2× {_fb - _fa:.1f} breit (ab ±{_fa:.1f}), oben {f.GROOVE_TOP:.0f} abgesetzt, {_tl:.1f} lang.",
     f"4. Hinten 2× M3-Sackgewinde von unten, Kernloch Ø2,5 × 4, Gewinde {f.COVER_THREAD:.0f} tief (2 mm Restwand) – keine Bohrungen oben.",
-    f"5. Ziernut oben rechtwinklig, {f.DECO_W} × {f.DECO_D} tief: vorn an der Deckelstirn (Stoß zur Front), seitlich {f.W / 2 - f.deco_rect()[1]:.1f} von der Kante, nach hinten durchlaufend (Gravierfräser/Kugelfräser Ø0,6), vor dem Eloxieren.",
+    f"5. Ziernut oben {f.DECO_W} × {f.DECO_D} tief, zwei gerade Linien {f.W / 2 - f.deco_rect()[1]:.0f}..{f.W / 2 - f.deco_rect()[0]:.1f} von der Kante ab Ende Frontzone bis hinten offen (Gravierfräser Ø0,6), vor dem Eloxieren. Frontzone {2 * (f.W / 2 - f.END_W - f.JOINT):.1f} breit, Ecken R{f.SEAT_R - f.JOINT:.1f}: Fuge {f.JOINT} zur Front rundum.",
     "6. Oberfläche wie Rahmen (Glasperlen + Eloxal schwarz) oder gebürstet + Eloxal natur.",
     "MONTAGE: Deckel von hinten flach einschieben (liegt auf den Seitenteilen), Feder in die Nut; liegt auf Wulst, Laschen",
     f"und Schaumstoff ({f.FOAM_T:.0f} → {f.FOAM_C}). Hinten 2× ISO 4762 M3×10 von unten durch die Wulst (Zugang bei abgenommenem Bodenblech).",
