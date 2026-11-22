@@ -13,7 +13,8 @@ Display: 2x DFRobot DFR0524 5,5" AMOLED 1080x1920 (HDMI), quer nebeneinander,
 import cadquery as cq
 
 # ---------------- Rahmen / Träger ----------------
-W, H, T = 430.0, 78.0, 12.0           # Außenmaß (Korpus ohne Füße; Fotos: ca. 74 + Füße, 78 wegen DFR0524), Gesamtdicke
+W, H, T = 430.0, 78.0, 13.5           # Außenmaß (Korpus ohne Füße; Fotos: ca. 74 + Füße, 78 wegen DFR0524), Frontdicke
+                                      # (Lippe 1,5 + Platte 3 + Träger 9)
 FRAME_B = 4.0                         # sichtbarer Alu-Rand
 FRAME_R = 2.0                         # Innenradius Fronttasche
 EDGE_CHAMFER = 0.5
@@ -59,12 +60,26 @@ TAB_SCREW_Z = T - 26.0                # 26 mm hinter der Frontfläche (Foto: 26-
 SCREW_LEN = 8                         # ISO 10642 M3x8 (Lasche 3 + Gewinde 5)
 FL_Z0 = T - DEPTH                     # Z der Flanschrückseite
 
-# ---------------- Frontplatte (Plexiglas) ----------------
+# ---------------- Front zweiteilig: Blende + Platte + Träger ----------------
+# Blende (Alu, sichtbar): Ring W x H mit Lippe LIP_T vorn, Fenster POCKET_W x POCKET_H (Rand FRAME_B), dahinter Falz für die
+# Platte; Wände 2,5 mm, Seitenwände volle Tiefe (Front umgreift die Ecke). Plexiglasplatte wird VON HINTEN eingelegt,
+# Kante + Dehnspalt liegen verdeckt hinter der Lippe -> keine sichtbare Fuge. Träger (Alu) von hinten eingesetzt: Display-
+# tasche, Taster, Knopflager, Flansche/Auflage, Laschen. Blende <-> Träger: M2,5 Senkschrauben von unten (Unterseite).
+LIP_T = 1.5                           # Lippe vor der Platte
+LIP_CH = 0.4                          # 45°-Fase an der Fensterkante
 PANEL_T = 3.0                         # PLEXIGLAS LED B&W 9H04 SC / 7H25 GT
-PANEL_GAP = 0.3                       # Spiel je Seite (Wärmedehnung PMMA!)
-CARRIER_T = T - PANEL_T               # Trägerdicke = 9
-POCKET_W, POCKET_H = W - 2 * FRAME_B, H - 2 * FRAME_B
-PANEL_W, PANEL_H = POCKET_W - 2 * PANEL_GAP, POCKET_H - 2 * PANEL_GAP
+PANEL_OVL = 1.2                       # Platte unter der Lippe je Seite
+PANEL_GAP = 0.3                       # Dehnspalt je Seite im Falz (PMMA ~3x Alu)
+SEAT_GAP = 0.3                        # Träger-Vorderseite hinter der Platte (Poron 0,5 dazwischen, PMMA-Dickentoleranz)
+CARRIER_T = T - LIP_T - PANEL_T       # Plattenrückseite = 9 (Träger-Vorderseite CARRIER_T - SEAT_GAP)
+POCKET_W, POCKET_H = W - 2 * FRAME_B, H - 2 * FRAME_B          # Fenster in der Lippe
+PANEL_W, PANEL_H = POCKET_W + 2 * PANEL_OVL, POCKET_H + 2 * PANEL_OVL
+PANEL_R = FRAME_R + PANEL_OVL
+RAB_X, RAB_Y = PANEL_W / 2 + PANEL_GAP, PANEL_H / 2 + PANEL_GAP   # Falz/Durchgang in der Blende (halbe Maße)
+RAB_R = PANEL_R + PANEL_GAP
+BZ_CLR = 0.1                          # Spiel Träger <-> Blende
+BZ_SCREW_X = (-208.0, -172.0, -135.0, 135.0, 172.0, 208.0)       # M2,5 Senk von unten (Unterseite), außerhalb der Displaytasche
+BZ_SCREW_Z = (T - BAND + CARRIER_T - SEAT_GAP) / 2                 # Mitte Band-Rückseite .. Trägerfront
 
 # ---------------- Display ----------------
 DISP_W, DISP_H = 2 * 124.0, 71.0      # 2x DFR0524 Outline, Stoß bei X=0
@@ -115,7 +130,28 @@ def rrect(w, h, r):
     return cq.Sketch().rect(w, h).vertices().fillet(r)
 
 
-def make_frame():
+def _groove_tool():
+    """Nut für die Deckelfeder (Bandrückseite, Scheibenfräser), zwei Abschnitte neben der Displaytasche."""
+    import math
+    zb = T - BAND
+    ix = W / 2 - END_W
+    run = math.sqrt(CUTTER_R ** 2 - (CUTTER_R - GROOVE_D) ** 2)  # Auslauflänge an der Rückseite
+    g = None
+    for sx in (1, -1):                         # zwei Nutabschnitte links/rechts der Displaytasche, je 2 Fräserausläufe
+        xa, xb = GROOVE_X0 + run, ix - run
+        seg = (cq.Workplane("XZ").workplane(offset=-(H / 2 - GROOVE_TOP)).center(sx * (xa + xb) / 2, zb)
+               .rect(xb - xa, 2 * GROOVE_D).extrude(GROOVE_H))
+        for xc in (xa, xb):
+            seg = seg.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(
+                CUTTER_R, GROOVE_H, cq.Vector(sx * xc, H / 2 - GROOVE_TOP - GROOVE_H, zb + GROOVE_D - CUTTER_R),
+                cq.Vector(0, 1, 0))))
+        g = seg if g is None else g.union(seg)
+    return g.intersect(cq.Workplane("XY").box(2 * ix, H, zb + GROOVE_D - FL_Z0 + 1, centered=(True, True, False))
+                       .translate((0, 0, FL_Z0 - 1)))
+
+
+def _front_body(front_pocket=False):
+    """Front als Vollkörper (alte einteilige Geometrie) – Basis für Träger (Schnitt) und Testfront."""
     p = cq.Workplane("XY").box(W, H, T, centered=(True, True, False))
     p = p.faces(">Z").edges().chamfer(EDGE_CHAMFER)
 
@@ -128,21 +164,7 @@ def make_frame():
         # Auflage hinter dem Band: oben Deckel + Schaumstoff, unten Bodenplatte
         p = p.cut(cq.Workplane("XY").box(2 * ix, seat + 0.01, zb - FL_Z0 + 0.01, centered=(True, True, False))
                   .translate((0, sy * (H / 2 - seat / 2 + 0.005), FL_Z0 - 0.01)))
-    # Nut für die Deckelfeder in der Bandrückseite (zwischen den Seitenwänden, Enden mit Fräserauslauf R)
-    import math
-    run = math.sqrt(CUTTER_R ** 2 - (CUTTER_R - GROOVE_D) ** 2)  # Auslauflänge an der Rückseite
-    g = None
-    for sx in (1, -1):                         # zwei Nutabschnitte links/rechts der Displaytasche, je 2 Fräserausläufe
-        xa, xb = GROOVE_X0 + run, ix - run
-        seg = (cq.Workplane("XZ").workplane(offset=-(H / 2 - GROOVE_TOP)).center(sx * (xa + xb) / 2, zb)
-               .rect(xb - xa, 2 * GROOVE_D).extrude(GROOVE_H))
-        for xc in (xa, xb):
-            seg = seg.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(
-                CUTTER_R, GROOVE_H, cq.Vector(sx * xc, H / 2 - GROOVE_TOP - GROOVE_H, zb + GROOVE_D - CUTTER_R),
-                cq.Vector(0, 1, 0))))
-        g = seg if g is None else g.union(seg)
-    p = p.cut(g.intersect(cq.Workplane("XY").box(2 * ix, H, zb + GROOVE_D - FL_Z0 + 1, centered=(True, True, False))
-                          .translate((0, 0, FL_Z0 - 1))))
+    p = p.cut(_groove_tool())
 
     # Innenecken der Auflage (Band-Rückseite / Seitenwand) senkrecht ausgerundet SEAT_R (Fräserradius, wie Original)
     for sy, seat in ((1, SEAT_D), (-1, BOT_T)):
@@ -172,9 +194,9 @@ def make_frame():
             p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCone(3.3, 1.5, 1.8, cq.Vector(xs, yf + sy * 0.01, TAB_SCREW_Z),
                                                                cq.Vector(0, -sy, 0))))
 
-    # Fronttasche für vollflächige Plexiglasplatte
-    p = p.cut(cq.Workplane("XY").workplane(offset=CARRIER_T)
-              .placeSketch(rrect(POCKET_W, POCKET_H, FRAME_R)).extrude(PANEL_T + 1))
+    if front_pocket:                           # nur Testfront: Platte von vorn in Fenstergröße, zurückgesetzt wie hinter der Lippe
+        p = p.cut(cq.Workplane("XY").workplane(offset=CARRIER_T)
+                  .placeSketch(rrect(POCKET_W, POCKET_H, FRAME_R)).extrude(T - CARRIER_T + 1))
 
     # Displaytasche von hinten, durch den Träger bis an die Platte, mit Eckfreistichen
     cut = cq.Workplane("XY").center(DISP_X, 0).rect(PNL_W, PNL_H).extrude(PNL_DEPTH)
@@ -218,8 +240,55 @@ def make_frame():
     return p
 
 
+def make_bezel():
+    """Blende: Ring mit Lippe + Fenster (Fase), Falz für die Platte, Seitenwände volle Tiefe, Nut-Oberkante, Senkungen unten."""
+    zb = T - BAND
+    b = cq.Workplane("XY").box(W, H, T - FL_Z0, centered=(True, True, False)).translate((0, 0, FL_Z0))
+    b = b.faces(">Z").edges().chamfer(EDGE_CHAMFER)
+    inner = (cq.Workplane("XY").workplane(offset=FL_Z0 - 1).placeSketch(rrect(2 * RAB_X, 2 * RAB_Y, RAB_R))
+             .extrude(T - LIP_T - FL_Z0 + 1))
+    # hinter dem Band: Deckel-/Bodenzone frei; Ecken |x| > W/2-END_W oben/unten bleiben Blende (sichtbare Ecke ohne Fuge)
+    behind = (cq.Workplane("XY").box(2 * (W / 2 - END_W), H + 2, zb - FL_Z0 + 1, centered=(True, True, False))
+              .translate((0, 0, FL_Z0 - 1)))
+    win = cq.Workplane("XY").workplane(offset=T - LIP_T - 0.1).placeSketch(rrect(POCKET_W, POCKET_H, FRAME_R)).extrude(LIP_T + 1)
+    b = b.cut(inner).cut(behind).cut(win)
+    b = b.edges(cq.selectors.BoxSelector((-POCKET_W / 2 - 0.2, -POCKET_H / 2 - 0.2, T - 0.05),
+                                         (POCKET_W / 2 + 0.2, POCKET_H / 2 + 0.2, T + 0.05))).chamfer(LIP_CH)
+    b = b.cut(_groove_tool())
+    for x in BZ_SCREW_X:                       # M2,5 Senkkopf von unten
+        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.4, H / 2 - RAB_Y + 0.2, cq.Vector(x, -H / 2 - 0.1, BZ_SCREW_Z),
+                                                               cq.Vector(0, 1, 0))))
+        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCone(2.75, 1.25, 1.5, cq.Vector(x, -H / 2 - 0.01, BZ_SCREW_Z),
+                                                           cq.Vector(0, 1, 0))))
+    return cq.Workplane("XY").add(b.val().Solids()[0])
+
+
+def make_carrier():
+    """Träger: Vollkörper innerhalb der Blende, vorn SEAT_GAP hinter der Platte; Gewinde M2,5 für die Blende."""
+    zb = T - BAND
+    z0 = FL_Z0 - TAB_L - 5
+    reg = (cq.Workplane("XY").workplane(offset=z0).placeSketch(rrect(2 * (RAB_X - BZ_CLR), 2 * (RAB_Y - BZ_CLR), RAB_R - BZ_CLR))
+           .extrude(CARRIER_T - SEAT_GAP - z0))
+    reg = reg.union(cq.Workplane("XY").box(2 * (W / 2 - END_W - BZ_CLR), H + 2, zb - z0, centered=(True, True, False))
+                    .translate((0, 0, z0)))
+    c = _front_body().intersect(reg)
+    for x in BZ_SCREW_X:
+        c = c.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.03, 6.0, cq.Vector(x, -RAB_Y, BZ_SCREW_Z), cq.Vector(0, 1, 0))))
+    return cq.Workplane("XY").add(c.val().Solids()[0])
+
+
+def make_frame():
+    """Blende + Träger als Compound (Darstellung, Kollisionsprüfung)."""
+    return cq.Workplane("XY").add(cq.Compound.makeCompound([make_bezel().val(), make_carrier().val()]))
+
+
+def make_front_onepiece():
+    """Testfront: einteilig, Platte von vorn in Fenstergröße, 1,5 zurückgesetzt."""
+    return _front_body(front_pocket=True)
+
+
 def make_panel():
-    p = cq.Workplane("XY").placeSketch(rrect(PANEL_W, PANEL_H, FRAME_R + PANEL_GAP)).extrude(PANEL_T)
+    p = cq.Workplane("XY").placeSketch(rrect(PANEL_W, PANEL_H, PANEL_R)).extrude(PANEL_T)
     p = p.cut(cq.Workplane("XY").pushPoints(btn_positions()).circle(BTN_PANEL_D / 2).extrude(PANEL_T))
     p = p.cut(cq.Workplane("XY").center(KNOB_X, 0).circle(SHAFT_PANEL_D / 2).extrude(PANEL_T))
     p = p.cut(cq.Workplane("XY").center(PWR_X, PWR_Y).circle(PWR_PANEL_D / 2).extrude(PANEL_T))
@@ -230,7 +299,7 @@ def make_button_cap():
     # Stößel Ø3 x 4,2 | Bund Ø8,6 x 1,5 | Schaft Ø6: 4 Träger + 3 Platte + 1,5 Überstand
     stem = cq.Workplane("XY").circle(1.5).extrude(4.2)
     collar = cq.Workplane("XY").workplane(offset=4.2).circle(4.3).extrude(1.5)
-    shaft_len = (T - BTN_CB_DEPTH) + 1.5
+    shaft_len = (CARRIER_T + PANEL_T - BTN_CB_DEPTH) + 1.5   # 1,5 über Plattenfront
     shaft = (cq.Workplane("XY").workplane(offset=5.7).circle(3.0).extrude(shaft_len)
              .faces(">Z").edges().fillet(0.5))
     return stem.union(collar).union(shaft)
@@ -666,7 +735,7 @@ def make_power_cap():
     """Lokal: Z=0 = Stößelende."""
     stem = cq.Workplane("XY").circle(1.5).extrude(PWR_STEM)
     collar = cq.Workplane("XY").workplane(offset=PWR_STEM).circle(PWR_CB_D / 2 - 0.2).extrude(1.5)
-    shaft = (cq.Workplane("XY").workplane(offset=PWR_STEM + 1.5).circle(PWR_D / 2).extrude(T - PWR_CB_DEPTH + 1.5)
+    shaft = (cq.Workplane("XY").workplane(offset=PWR_STEM + 1.5).circle(PWR_D / 2).extrude(CARRIER_T + PANEL_T - PWR_CB_DEPTH + 1.5)
              .faces(">Z").edges().fillet(1.5))
     return stem.union(collar).union(shaft)
 
@@ -733,12 +802,14 @@ if __name__ == "__main__":
             os.remove(os.path.join(out, fn))
     frame = make_frame()
     panel = make_panel()
-    cq.exporters.export(frame, f"{out}/RD160_Front_Rahmen.step")
+    cq.exporters.export(make_bezel(), f"{out}/RD160_Front_Blende.step")
+    cq.exporters.export(make_carrier(), f"{out}/RD160_Front_Traeger.step")
     cq.exporters.export(panel, f"{out}/RD160_Front_Plexiglas.step")
     cq.exporters.export(panel.section(PANEL_T / 2), f"{out}/RD160_Front_Plexiglas.dxf")
     cq.exporters.export(make_button_cap(), f"{out}/RD160_Tasterkappe.step")
     asm = (cq.Assembly()
-           .add(frame, name="Rahmen", color=cq.Color(0.16, 0.16, 0.17))
+           .add(make_bezel(), name="Blende", color=cq.Color(0.16, 0.16, 0.17))
+           .add(make_carrier(), name="Traeger", color=cq.Color(0.45, 0.46, 0.48))
            .add(panel, name="Plexiglas", loc=cq.Location((0, 0, CARRIER_T)),
                 color=cq.Color(0.05, 0.05, 0.05)))
     for name, fn in (("Knopf_Becher", make_knob_shell), ("Knopf_Lichtleiter_PMMA", make_light_tube),
@@ -758,7 +829,8 @@ if __name__ == "__main__":
     asm.add(make_cover_edge(), name="Deckel_Ausschnitt", color=cq.Color(0.75, 0.76, 0.78))
     asm.save(f"{out}/RD160_Front_Baugruppe.step")
     # Kollisionsprüfung Rahmen / Seitenteile / Deckel / Schaumstoff / Schrauben
-    chk = {"Rahmen": frame, "Seitenteil_r": make_side_panel(1), "Seitenteil_l": make_side_panel(-1),
+    chk = {"Blende": make_bezel(), "Traeger": make_carrier(), "Platte": panel.translate((0, 0, CARRIER_T)),
+           "Seitenteil_r": make_side_panel(1), "Seitenteil_l": make_side_panel(-1),
            "Deckel": make_cover(), "Boden": make_bottom(), "Rueckwand": make_rear_panel(),
            "Schaum": make_foam(), "Schrauben": make_tab_screws()}
     chk["Querleiste_o"] = make_crossbar(True)

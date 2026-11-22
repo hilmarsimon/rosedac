@@ -113,7 +113,7 @@ def draw(a, sec, name):
 
 
 yt = f.H / 2
-P = [("Front", f.make_frame()), ("Deckel", cover), ("Seitenteil", f.make_side_panel(1)),
+P = [("Front", cq.Workplane("XY").add(f.make_bezel().val().fuse(f.make_carrier().val()))), ("Deckel", cover), ("Seitenteil", f.make_side_panel(1)),
      ("Schaum", f.make_foam()), ("Rückwand", f.make_rear_panel())]
 # A: Längsschnitt vorn bei X = 0
 a1 = fig.add_axes([0.67, 0.68, 0.31, 0.24]); a1.set_aspect("equal"); a1.axis("off")

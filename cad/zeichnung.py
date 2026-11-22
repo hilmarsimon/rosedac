@@ -75,7 +75,7 @@ def front_view(ax):
     dim_v(ax, f.BTN_ROWS_Y[1], f.BTN_ROWS_Y[0], f.BTN_X0 - 7, f"{f.BTN_ROWS_Y[0] - f.BTN_ROWS_Y[1]:.0f}")
 
     note(ax, (-120, f.POCKET_H / 2), (-150, 62),
-         f"Fronttasche {f.POCKET_W:.0f}×{f.POCKET_H:.0f}, R{f.FRAME_R:.0f}, T {f.PANEL_T:.1f} +0,1/0 "
+         f"Fenster Blende {f.POCKET_W:.0f}×{f.POCKET_H:.0f}, R{f.FRAME_R:.0f}, Lippe {f.LIP_T}, Fase {f.LIP_CH} "
          f"(Rand {f.FRAME_B:.0f} mm)")
     note(ax, (f.BTN_X0 + 4 * f.BTN_PITCH_X, f.BTN_ROWS_Y[0]), (-215, 52), f"10× Ø{f.BTN_HOLE_D} H9 durch")
     note(ax, (f.KNOB_X - f.RING_OD / 2 * 0.7, f.RING_OD / 2 * 0.7), (110, 62),
@@ -148,14 +148,17 @@ def sheet2(pdf):
     ax.set_title("GEWINDETABELLE (Ursprung Plattenmitte, X rechts in Vorderansicht)", fontsize=9, loc="left")
 
     notes = [
-        "ALU-RAHMEN – FERTIGUNG",
+        "FRONT ZWEITEILIG: BLENDE + TRÄGER (Alu) – FERTIGUNG",
         f"1. EN AW-6061-T6, Rohteil {f.W:.0f} × {f.H:.0f} × {f.DEPTH + f.TAB_L:.0f} mm. Glasperlstrahlen fein (alle Flächen inkl. Taschenböden),",
         "   danach Eloxal Typ II schwarz matt, verdichtet. Schichtdicke 10–15 µm.",
         f"   ABDECKEN (nicht eloxieren): Lagersitz Ø{f.BEARING_D:.0f} H7 + Bohrung Ø{f.SHAFT_HOLE_D:.0f}; Ringfläche Ø8 um die 6 Bohrungen A",
         "   auf der Rückseite (Masseverbindung zum Chassis). Gewinde M3 dürfen eloxiert sein.",
         f"2. Außenkanten vorn Fase {f.EDGE_CHAMFER}×45°, sonst gratfrei.",
-        f"3. Fronttasche {f.POCKET_W:.0f}×{f.POCKET_H:.0f}, T {f.PANEL_T:.1f} +0,1/0, Boden eben ≤0,1, R{f.FRAME_R:.0f}.",
-        f"4. Displaytasche T {f.PNL_DEPTH:.0f} = bis Fronttasche durchbrochen.",
+        f"3. BLENDE: Fenster {f.POCKET_W:.0f}×{f.POCKET_H:.0f} R{f.FRAME_R:.0f} in Lippe {f.LIP_T}, Fase {f.LIP_CH}×45° vorn; Falz von hinten "
+        f"{2 * f.RAB_X:.1f}×{2 * f.RAB_Y:.1f} R{f.RAB_R:.1f}\n   durch bis hinten (Wand {f.W / 2 - f.RAB_X:.1f}); Ecken oben/unten hinter dem Band bleiben stehen. "
+        f"{len(f.BZ_SCREW_X)}× Ø2,8 + Senkung 90° Ø5,5 von unten (M2,5).",
+        f"4. TRÄGER: Außenmaß {2 * (f.RAB_X - f.BZ_CLR):.1f}×{2 * (f.RAB_Y - f.BZ_CLR):.1f}, Vorderseite {f.SEAT_GAP} hinter der Platte; "
+        f"Displaytasche durch; {len(f.BZ_SCREW_X)}× M2,5 von unten.",
         f"5. Lagersitz Ø{f.BEARING_D:.0f} H7 T{f.BEARING_DEPTH:.0f} von hinten (6805-2RS), Laufbohrung Ø{f.SHAFT_HOLE_D:.0f} H8 vorn.",
         "6. Lichtkanal + Lichttasche ergeben einen Ring mit 4 Stegen (Insel bleibt verbunden).",
         "7. Gewinde M3 nach Tabelle, alle von hinten, nicht durchgehend.",
@@ -166,17 +169,17 @@ def sheet2(pdf):
         f"   UNTEN: Auflage {f.BOT_T:.0f} tief. Seitenteil = C-Profil, Deckel/Boden mit L-Schenkel (eigene Teile).",
         "",
         "PLEXIGLASPLATTE (Laserzuschnitt, DXF)",
-        f"• {f.PANEL_W:.1f}×{f.PANEL_H:.1f}×{f.PANEL_T:.0f}, R{f.FRAME_R + f.PANEL_GAP:.1f}, "
+        f"• {f.PANEL_W:.1f}×{f.PANEL_H:.1f}×{f.PANEL_T:.0f}, R{f.PANEL_R:.1f}, "
         f"10× Ø{f.BTN_PANEL_D}, 1× Ø{f.SHAFT_PANEL_D}.",
         "• PLEXIGLAS LED Black & White 9H04 SC (matt) oder 7H25 GT (glänzend).",
-        f"• {f.PANEL_GAP} mm Spiel je Seite: PMMA dehnt sich ~3× stärker als Alu.",
-        "  Elastisch kleben (3M VHB 4910 klar, Streifen außerhalb Display/Ring), nicht starr.",
+        f"• Von hinten in die Blende, {f.PANEL_OVL} mm unter der Lippe, {f.PANEL_GAP} mm Dehnspalt je Seite (PMMA ~3× Alu).",
+        "  Nicht kleben: Träger drückt über Poron-Streifen 0,8 mm (außerhalb Display/Ring) gegen die Lippe.",
         "• Rückseite außerhalb Display und Ring nicht hell lackieren – Alu dahinter ist schwarz.",
         "",
         "ÜBRIGE TEILE",
         "• Display: 2× DFRobot DFR0524 5,5\" AMOLED (HDMI), quer, Stoß in X=0, Outline je 124×71.",
         "  Klemmrahmen (D) drückt über Moosgummi gegen die Platte. Module vorher nachmessen.",
-        f"• Tasterkappe 10× Alu: Stößel Ø3×4,2, Bund Ø8,6×1,5, Schaft Ø6×{f.T - f.BTN_CB_DEPTH + 1.5:.1f}.",
+        f"• Tasterkappe 10× Alu: Stößel Ø3×4,2, Bund Ø8,6×1,5, Schaft Ø6×{f.CARRIER_T + f.PANEL_T - f.BTN_CB_DEPTH + 1.5:.1f}.",
         "  Omron B3F-1000 auf PCB, Abstandsbolzen M3×5 an Pos. B.",
         "• Drehknopf: Becher mit Nabe Ø25 k6 in 6805-2RS, Haltescheibe hinten; O-Ring 26×2 + Nyogel = Dämpfung.",
         "  Knopfplatine an Pos. C (4-mm-Bolzen): AS5600 unter Diametralmagnet + 12 LEDs, wie RD160.",

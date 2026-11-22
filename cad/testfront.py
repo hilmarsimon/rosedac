@@ -12,14 +12,15 @@ os.makedirs(OUT, exist_ok=True)
 W, H, T = f.W, f.H, f.T
 
 INSERT_D, INSERT_L = 4.0, 6.0          # M3-Einschmelzmutter (Ruthex M3×5,7: Bohrung Ø4,0)
-DOWEL_D, DOWEL_L = 3.1, 8.0            # Passstift Ø3×15 (Stahl/Filament), je Seite 8 tief
-DOWEL_PTS = [(40.0, 4.5), (-40.0, 4.5)]   # (Y, Z) im Steg ober-/unterhalb der Displaytasche
+DOWEL_L = 8.0                           # Passstifte je Seite 8 tief
+DOWEL_PTS = [(-34.0, -2.75, 3.1), (37.2, 11.25, 2.1)]   # (Y, Z, Ø): unten im Flansch Ø3, oben im Steg über dem Fenster Ø2
 DISP_T = 3.0                            # Annahme Dicke Displaymodul (Glas+Folie) – am echten Modul messen!
 CLAMP_GAP = 0.5                         # Luft Klammerfinger -> Display (Schaumstoff 1 mm dazwischen)
 
 
 def plate():
-    body = f.make_frame().intersect(cq.Workplane("XY").box(W + 2, H + 2, T, centered=(True, True, False)))
+    # Testfront einteilig: Platte von vorn in Fenstergröße, 1,5 zurückgesetzt (Optik wie hinter der Lippe, Fuge sichtbar)
+    body = f.make_front_onepiece().intersect(cq.Workplane("XY").box(W + 2, H + 2, T, centered=(True, True, False)))
     pts = [pt for v in f.M3_HOLES.values() for pt in v]
     body = body.cut(cq.Workplane("XY").pushPoints(pts).circle(INSERT_D / 2).extrude(INSERT_L))
     return body
@@ -28,8 +29,8 @@ def plate():
 def half(sx):
     b = plate().intersect(cq.Workplane("XY").box(W / 2 + 1, H + 2, T + 2, centered=(False, True, False))
                           .translate((-(W / 2 + 1) if sx < 0 else 0, 0, -1)))
-    for y, z in DOWEL_PTS:
-        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(DOWEL_D / 2, DOWEL_L, cq.Vector(0, y, z),
+    for y, z, d in DOWEL_PTS:
+        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(d / 2, DOWEL_L, cq.Vector(0, y, z),
                                                                cq.Vector(sx, 0, 0))))
     return b
 
@@ -69,7 +70,9 @@ def panel_half(sx):
     pw = 210.0
     x0 = -0.25 - pw if sx < 0 else 0.25
     p = f.make_panel().intersect(cq.Workplane("XY").box(pw, H, 10, centered=(False, True, False)).translate((x0, 0, -1)))
-    return p
+    win = (cq.Workplane("XY").workplane(offset=-1)            # Testfront: Platte von vorn in die Fenstertasche (0,3 Spiel)
+           .placeSketch(f.rrect(f.POCKET_W - 0.6, f.POCKET_H - 0.6, f.FRAME_R - 0.3)).extrude(10))
+    return p.intersect(win)
 
 
 if __name__ == "__main__":

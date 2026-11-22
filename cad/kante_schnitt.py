@@ -10,12 +10,12 @@ import frontplatte as f
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
 T, H = f.T, f.H
 yt = H / 2
-ST = {"Front (Alu)": ("#c9ccd1", "///"), "Plexiglas": ("#2b2b2e", None), "Schaumstoff": ("#444", None),
+ST = {"Blende (Alu)": ("#c9ccd1", "///"), "Träger (Alu)": ("#a9adb3", "\\\\"), "Plexiglas": ("#2b2b2e", None), "Schaumstoff": ("#444", None),
       "Deckel": ("#9fb3c8", "\\\\"), "Seitenteil": ("#55585e", "\\\\\\"), "Schraube": ("#e0a030", None)}
 
 
 def parts():
-    return [("Front (Alu)", f.make_frame()), ("Plexiglas", f.make_panel().translate((0, 0, f.CARRIER_T))),
+    return [("Blende (Alu)", f.make_bezel()), ("Träger (Alu)", f.make_carrier()), ("Plexiglas", f.make_panel().translate((0, 0, f.CARRIER_T))),
             ("Schaumstoff", f.make_foam()), ("Deckel", f.make_cover_edge(45)),
             ("Seitenteil", f.make_side_stub(1, 45)), ("Schraube", f.make_tab_screws())]
 
@@ -57,7 +57,9 @@ a1.annotate(f"Nut {f.GROOVE_H} × {f.GROOVE_D:.0f} tief in der Bandrückseite,\n
             (-(T + 14), yt + 10), **lab)
 a1.annotate(f"Feder einseitig {f.TONGUE_T:.0f} × {f.TONGUE_L}, oben um {f.GROOVE_TOP:.0f} abgesetzt:\nSchaum drückt sie oben an den Steg → Deckel vorn gehalten",
             (-(zb + 1), yt - f.COVER_T + 0.8), (-(z0 - 6), yt - 27), **lab)
-a1.annotate("Plexiglas 3 mm", (-(T - 1.5), yt - 15), (-(T + 14), yt - 25), **lab)
+a1.annotate("Plexiglas 3 mm, von hinten eingelegt,\nKante verdeckt hinter der Lippe", (-(T - f.LIP_T - 1.5), yt - 15), (-(T + 6), yt - 25), ha="right", **lab)
+a1.annotate(f"Blende: Lippe {f.LIP_T} + Fase {f.LIP_CH}, Wand {f.H / 2 - f.RAB_Y:.1f}", (-(T - 0.7), yt - f.FRAME_B - 0.3), (-(T + 6), yt - 12), ha="right", **lab)
+a1.annotate("Träger (von hinten, M2,5 von unten\nan die Blende geschraubt)", (-(f.CARRIER_T - 4), yt - 20), (-(f.FL_Z0 - 6), yt - 40), **lab)
 a1.set_aspect("equal"); a1.axis("off")
 a1.set_xlim(-(T + 16), -(z0 - 42)); a1.set_ylim(yt - 32, yt + 16)
 a1.set_title(f"① Oberkante, Schnitt bei X = {XS} (Nutabschnitt, Front links)", fontsize=10, loc="left")

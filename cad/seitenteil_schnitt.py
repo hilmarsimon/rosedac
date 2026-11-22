@@ -15,7 +15,7 @@ ST = {"Front": ("#c9ccd1", "///"), "Deckel": ("#9fb3c8", "\\\\"), "Boden": ("#9f
       "Seitenteil": ("#55585e", "\\\\\\"), "Schraube": ("#e0a030", None), "Plexiglas": ("#2b2b2e", None),
       "Schaum": ("#444", None)}
 L = 60
-P = [("Front", f.make_frame()), ("Plexiglas", f.make_panel().translate((0, 0, f.CARRIER_T))),
+P = [("Front", cq.Workplane("XY").add(f.make_bezel().val().fuse(f.make_carrier().val()))), ("Plexiglas", f.make_panel().translate((0, 0, f.CARRIER_T))),
      ("Deckel", f.make_cover_edge(L)), ("Seitenteil", f.make_side_stub(1, L)), ("Schraube", f.make_tab_screws()),
      ("Schaum", f.make_foam())]
 
