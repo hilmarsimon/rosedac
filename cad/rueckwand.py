@@ -16,7 +16,7 @@ cq.exporters.export(f.make_crossbar(True), f"{OUT}/RD160_Querleiste_oben.step")
 cq.exporters.export(f.make_crossbar(False), f"{OUT}/RD160_Querleiste_unten.step")
 
 PW = f.W - 2 * f.SIDE_T - 0.2                     # Wandbreite
-yT, yB = f.H / 2 - f.COVER_T, -f.H / 2 + f.BOT_T   # Ober-/Unterkante Wand
+yT, yB = f.RP_YT, f.RP_YB                         # Ober-/Unterkante Wand
 SCR = f.rear_screw_points()                       # (v, y) Rückansicht
 
 

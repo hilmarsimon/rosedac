@@ -9,7 +9,7 @@ import frontplatte as f
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
 W, H = f.W, f.H
-FLOOR = -H / 2 + f.BOT_T                 # Oberseite Bodenblech
+FLOOR = -H / 2 + f.BOT_LIP + f.BOT_T     # Oberseite Bodenblech
 ZR = f.Z_REAR + f.RP_T                   # Innenseite Rückwand
 
 # name, gruppe, x0, x1, z_vorn, z_hinten, höhe, rund   (Variante Acko + Ian Canada + Eigenbau, Stand 11/2026)
@@ -109,7 +109,7 @@ notes = ("Signalweg: Coax 1/2, AES (Übertrager) → Relais-Mux (Eingangsplatine
          "AKD49S I²S-Direkteingang + ext. MCLK. PC AUDIO IN (USB-B) → USB-Eingang des AKD49S. Ausgänge AKD49S (XLR/Cinch-Option als Stiftleiste) → Einbaubuchsen.\n"
          "Steuerung: RP2040 ↔ Pi 5 (UART/JSON), RP2040 ↔ AKD49S-Controller (I²C/API: Eingang, Lautstärke AK4191, Filter), Relais, Trigger, Sanftanlauf.\n"
          "Gelb: Buchsenkörper hinter der Rückwand, grau: Querleiste. Acko-Maße fehlen (Platzhalter), IC-Maße teils ca. H = Platzhalterhöhe über Bodenblech, "
-         f"Innenhöhe {H - f.COVER_T - f.BOT_T:.0f}.")
+         f"Innenhöhe {H - f.COVER_T - f.BOT_LIP - f.BOT_T:.0f}.")
 fig.text(0.04, 0.02, notes, fontsize=7.5, va="bottom")
 ax.set_xlim(-W / 2 - 10, W / 2 + 30); ax.set_ylim(f.Z_REAR - 48, f.T + 20)
 ax.set_title("RD160-Nachbau – Platzplan AckoDAC AKD49S + Ian Canada + Eigenbau, Draufsicht, Front unten, mm", fontsize=11, loc="left")

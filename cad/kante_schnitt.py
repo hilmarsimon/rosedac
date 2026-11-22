@@ -20,6 +20,24 @@ def parts():
             ("Seitenteil", f.make_side_stub(1, 45)), ("Schraube", f.make_tab_screws())]
 
 
+def wire_pts(w, n):
+    """Punkte einer Kontur kantenweise in Laufrichtung (robust gegen entartete Kanten)."""
+    import cadquery as cq
+    from OCP.BRepTools import BRepTools_WireExplorer
+    ex, pts = BRepTools_WireExplorer(w.wrapped), []
+    while ex.More():
+        e = cq.Edge(ex.Current())
+        rev = ex.Orientation().name == "TopAbs_REVERSED" if hasattr(ex.Orientation(), "name") else False
+        try:
+            k = max(2, int(n * e.Length() / max(w.Length(), 1e-6)))
+            ep = [(p.x, p.y) for p in e.positions([i / k for i in range(k + 1)])]
+        except Exception:
+            ep = [(v.X, v.Y) for v in e.Vertices()]
+        pts += ep[::-1] if rev else ep
+        ex.Next()
+    return pts
+
+
 def draw(ax, wp, name):
     col, hat = ST[name]
     try:
@@ -28,10 +46,10 @@ def draw(ax, wp, name):
         return
     for face in sec.faces().vals():
         n = 4000
-        pts = [(p.x, p.y) for p in face.outerWire().positions([i / n for i in range(n + 1)])]
+        pts = wire_pts(face.outerWire(), n)
         ax.add_patch(Polygon(pts, closed=True, fc=col, ec="k", lw=0.7, hatch=hat))
         for inner in face.innerWires():
-            ip = [(p.x, p.y) for p in inner.positions([i / 100 for i in range(101)])]
+            ip = wire_pts(inner, 100)
             ax.add_patch(Polygon(ip, closed=True, fc="white", ec="k", lw=0.5))
 
 
