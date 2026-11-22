@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+# FreeCAD-Makro (FreeCAD 0.21 / 1.x): lädt die erzeugten STEP-Dateien des RD160-Nachbaus in ein Dokument.
+# Quelle der Geometrie bleiben die CadQuery-Skripte in cad/ – dieses Dokument ist zum Ansehen, Messen,
+# Zeichnen (TechDraw) und für CAM gedacht. Änderungen an Maßen in cad/frontplatte.py, dann build_all.sh, dann Makro neu.
+# Aufruf: Makro > Makros … > RD160_laden.FCMacro (Ordner cad/freecad als Makro-Pfad) oder Datei per Doppelklick öffnen.
+import os
+import FreeCAD as App
+import ImportGui
+
+HIER = os.path.dirname(os.path.abspath(__file__))
+STEP = os.path.normpath(os.path.join(HIER, "..", "out", "cad"))
+
+GRUPPEN = {                                    # Gruppenname: Dateien (ohne .step)
+    "Gehaeuse": ["RD160_Gehaeuse_Vorschau"],   # Front, Deckel, Boden, Seitenteile, Rückwand, Knopf (Baugruppe mit Farben)
+    "Drehknopf": ["RD160_Drehknopf_Baugruppe"],
+    "Platzplan_AK": ["RD160_Platzplan_Platzhalter"],
+    "Platzplan_IC": ["RD160_Platzplan_Variante_IC"],
+}
+
+doc = App.newDocument("RD160")
+for gruppe, dateien in GRUPPEN.items():
+    vorher = set(o.Name for o in doc.Objects)
+    for d in dateien:
+        pfad = os.path.join(STEP, d + ".step")
+        if os.path.exists(pfad):
+            ImportGui.insert(pfad, doc.Name)
+        else:
+            App.Console.PrintWarning(f"fehlt: {pfad} – erst cad/build_all.sh laufen lassen\n")
+    neu = [o for o in doc.Objects if o.Name not in vorher and not o.InList]
+    g = doc.addObject("App::DocumentObjectGroup", gruppe)
+    for o in neu:
+        g.addObject(o)
+    if gruppe.startswith("Platzplan"):
+        g.Visibility = False                       # Platzpläne ausgeblendet, bei Bedarf einschalten
+doc.recompute()
+try:
+    import FreeCADGui as Gui
+    Gui.activeDocument().activeView().viewIsometric()
+    Gui.SendMsgToActiveView("ViewFit")
+except Exception:
+    pass
+App.Console.PrintMessage(f"RD160 geladen aus {STEP}\n")

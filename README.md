@@ -19,6 +19,8 @@ Schwerpunkt bisher: Front, Drehknopf, Gehäuse, Bedienlogik, Hardware-Architektu
 pip install -r requirements.txt          # + Systempakete: librsvg2-bin, imagemagick
 cad/build_all.sh                          # erzeugt alles in cad/out/ und sortiert nach Typ
 ```
+**FreeCAD:** `cad/freecad/RD160_laden.FCMacro` lädt Gehäuse, Drehknopf und Platzpläne aus `cad/out/cad/` in ein Dokument (Ansehen, Messen, TechDraw, CAM). Die Geometrie wird weiter in den CadQuery-Skripten geändert.
+
 Zentrale Parameter (Maße, Laschen, Deckel, Nut, Rippen, Knopf) stehen in `cad/frontplatte.py`; alle anderen Skripte importieren sie.
 
 ## Stand (11/2026)
