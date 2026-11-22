@@ -1,0 +1,14 @@
+[Unit]
+Description=RD160 Test-UI (2x AMOLED)
+After=multi-user.target
+
+[Service]
+User=pi
+Environment=SDL_VIDEODRIVER=kmsdrm
+WorkingDirectory=/home/pi/rd160
+ExecStart=/usr/bin/python3 /home/pi/rd160/rd160_ui.py --port /dev/ttyACM0
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
