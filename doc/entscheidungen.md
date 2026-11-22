@@ -25,7 +25,8 @@
 |---|---|---|
 | DAC | A: AckoDAC AKD49S (AK4191 + AK4499EX, 835 USD) · B: Ian Canada ES9038Q2M Dual Mono + I/V STD | A, wenn Acko I²C-Steuerung durch RP2040, Takt vom FifoPi, Maße und Versorgung bestätigt; sonst B |
 | Eingänge/Takt | Ian Canada ReceiverPi DDC II + FifoPi Q7 III | in beiden Varianten gesetzt |
-| Displaymodul-Dicke | Annahme 3 mm (`DISP_T` in `cad/testfront.py`) | am echten DFR0524 messen |
+| Display (neu wegen Höhe ~74 mm) | A: 6,52" AMOLED PO652F2K 2520×840 (aktiv 157,2×52,4, Outline 159,5×54,4, MIPI → HDMI-Board Gesight/Panox) · B: 7,84" IPS 1280×400 (aktiv 190×59,5, Outline 205,8×68, Wisecoco ~49 $) · C: 8,8" IPS 1920×480 (aktiv 218,9×54,7, Outline 231,3×64,3) | A (echtes Schwarz wie Original, passt in 74 mm); B parallel als günstiger Optiktest. DFR0524 (71 mm hoch) passt nicht mehr. Original: ca. 200 mm breite AMOLED-Fläche |
+| Displaymodul-Dicke | Annahme 3 mm (`DISP_T` in `cad/testfront.py`) | am gewählten Display messen |
 | Fronthöhe | 88 mm; Original-Front evtl. niedriger | nach Displaytest prüfen |
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
