@@ -79,7 +79,7 @@ PANEL_R = FRAME_R + PANEL_OVL
 RAB_X, RAB_Y = PANEL_W / 2 + PANEL_GAP, PANEL_H / 2 + PANEL_GAP   # Falz/Durchgang in der Blende (halbe Maße)
 RAB_R = PANEL_R + PANEL_GAP
 BZ_CLR = 0.1                          # Spiel Träger <-> Blende
-BZ_SCREW_X = (-208.0, -172.0, -135.0, 135.0, 172.0, 208.0)       # M2,5 Senk von unten (Unterseite), außerhalb der Displaytasche
+BZ_SCREW_X = (-208.0, -172.0, -135.0, 135.0, 172.0, 208.0)       # ISO 7380 M2,5x8 von unten durch Bodenblech + Blende, außerhalb Display
 BZ_SCREW_Z = (T - BAND + CARRIER_T - SEAT_GAP) / 2                 # Mitte Band-Rückseite .. Trägerfront
 
 # ---------------- Display ----------------
@@ -258,12 +258,16 @@ def make_bezel():
     b = b.cut(_groove_tool())
     for blk in _bezel_corner_blocks(0.0):      # Innenecken Band/Seitenwand R SEAT_R, passend zur Deckel-/Bodenrundung
         b = b.union(blk)
-    for x in BZ_SCREW_X:                       # M2,5 Senkkopf von unten
+    b = b.cut(_below_floor())                  # Front steht auf dem Bodenblech (wie die Rückwand)
+    for x in BZ_SCREW_X:                       # ISO 7380 M2,5 von unten durch Bodenblech + Blende in den Träger
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.4, H / 2 - RAB_Y + 0.2, cq.Vector(x, -H / 2 - 0.1, BZ_SCREW_Z),
                                                                cq.Vector(0, 1, 0))))
-        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCone(2.75, 1.25, 1.5, cq.Vector(x, -H / 2 - 0.01, BZ_SCREW_Z),
-                                                           cq.Vector(0, 1, 0))))
     return cq.Workplane("XY").add(b.val().Solids()[0])
+
+
+def _below_floor():
+    """Bereich unter der Bodenblech-Oberseite (y < -H/2 + BOT_T) über die ganze Front."""
+    return cq.Workplane("XY").box(W + 2, BOT_T + 1, 200, centered=(True, False, True)).translate((0, -H / 2 - 1, 0))
 
 
 def _bezel_corner_blocks(clr):
@@ -290,7 +294,7 @@ def make_carrier():
            .extrude(CARRIER_T - SEAT_GAP - z0))
     reg = reg.union(cq.Workplane("XY").box(2 * (W / 2 - END_W - BZ_CLR), H + 2, zb - z0, centered=(True, True, False))
                     .translate((0, 0, z0)))
-    c = _front_body().intersect(reg)
+    c = _front_body().intersect(reg).cut(_below_floor())
     for blk in _bezel_corner_blocks(BZ_CLR):  # sichtbare Eckausrundung gehört zur Blende
         c = c.cut(blk)
     for x in BZ_SCREW_X:
@@ -540,12 +544,16 @@ def bot_front_points():
 
 
 def make_bottom():
-    """Bodenblech 1 mm, Rechteck W x Länge (keine Frontzone, keine Rundung): von der Rückseite bis an die Front-Rückseite,
-    unter Seitenwänden und Rückwand, außen bündig. ISO 7380 M3x6: 2 vorn + 2 hinten in die Wulst, 3 in die Querleiste."""
-    L = FL_Z0 - BOT_GAP - Z_REAR
+    """Bodenblech 1 mm, Rechteck W x Gerätetiefe: vorn bündig mit der Frontfläche, hinten mit der Rückwand; Front, Seitenteile
+    und Rückwand stehen darauf. ISO 7380 M3x6: 2 vorn + 2 hinten in die Wulst, 3 in die Querleiste; ISO 7380 M2,5x8 durch
+    Blech + Blende in den Träger."""
+    L = T - Z_REAR
     b = cq.Workplane("XY").box(W, BOT_T, L, centered=(True, False, False)).translate((0, -H / 2, Z_REAR))
     for x, z in cover_screw_points() + ql_fix_points() + bot_front_points():   # Ø3,4 für ISO 7380 M3x6 (Linsenkopf)
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.7, BOT_T + 0.2, cq.Vector(x, -H / 2 - 0.1, z), cq.Vector(0, 1, 0))))
+    for x in BZ_SCREW_X:                       # Ø2,8 für ISO 7380 M2,5x8 (Front)
+        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.4, BOT_T + 0.2, cq.Vector(x, -H / 2 - 0.1, BZ_SCREW_Z),
+                                                               cq.Vector(0, 1, 0))))
     return b
 
 
