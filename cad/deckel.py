@@ -20,6 +20,8 @@ asm = (cq.Assembly()
        .add(cover, name="Deckel", color=cq.Color(0.75, 0.76, 0.78))
        .add(f.make_foam(), name="Schaumstoff", color=cq.Color(0.08, 0.08, 0.08))
        .add(f.make_rear_panel(), name="Rueckwand", color=cq.Color(0.12, 0.12, 0.13))
+       .add(f.make_crossbar(True), name="Querleiste_oben", color=cq.Color(0.5, 0.5, 0.52))
+       .add(f.make_crossbar(False), name="Querleiste_unten", color=cq.Color(0.5, 0.5, 0.52))
        .add(f.make_bottom(), name="Bodenplatte", color=cq.Color(0.2, 0.2, 0.21))
        .add(f.make_tab_screws(), name="Laschenschrauben", color=cq.Color(0.3, 0.3, 0.3)))
 for sx, nm in ((1, "rechts"), (-1, "links")):

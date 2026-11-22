@@ -14,8 +14,9 @@
 | Steuerung | RP2040 als Master, Pi 5 nur Renderer + Displays (UART/JSON) | Bedienung unabhängig vom Pi-Boot |
 | Eigenentwicklung | nur Steuerplatine, Tasterplatine, Knopfplatine | DAC-/Mixed-Signal-Layout zu riskant für Eigenbau |
 | Testaufbau | Front vor der DAC-Bestellung testen | Displays/Optik/Knopf sind unabhängig vom DAC |
-| Rückwand | Anordnung wie Original (Handbuch-Reihenfolge, 2 Reihen); nur Einbaubuchsen mit kurzen Kabeln, Neutrik D-Serie für XLR/AES/HDMI/USB/RJ45; E-T-A 1658 als Breaker + C14 mit Sicherung; Gravur nach Eloxal | unabhängig von DAC-Variante A/B, einheitliche Ausschnitte |
-| Rückwand: nicht umgesetzt | SFP-USB, EXT. CLOCK 10 MHz (Schalter `REAR_EXT_CLOCK`) | im Modul-Stack keine Funktion |
+| Rückwand | Anordnung nach Originalfoto (Kanal R links, Digital Mitte, Kanal L rechts, Gravurrahmen wie Druck); Einbaubuchsen mit Kabeln, XLR/AES Neutrik D, E-T-A 1658 + C14 mit Sicherung | Optik Original, unabhängig von DAC-Variante |
+| Rückwandbefestigung | 10× M3 Senkkopf wie Original: 4 oben/4 unten in Querleisten Alu 10×10 (oben am Deckel, unten am Boden verschraubt), 2 seitlich mittig in Block im Seitenteil | Foto; Querleisten versteifen das Gehäuse hinten |
+| Abweichungen Rückwand | SFP-Platz → LAN (Pi 5), SVC → USB-C RP2040, EXT. CLOCK entfällt (`EXT_CLOCK`), eigenes Typenschild statt Logo/Zulassungszeichen | Modul-Stack; keine fremden Marken/Prüfzeichen |
 | COAX 2 (BNC), AES/EBU | Relais-Umschaltung auf den Coax-Eingang der ReceiverPi DDC II, AES über Übertrager 110→75 Ω, RP2040 schaltet | DDC II hat nur einen S/PDIF-Eingang |
 
 ## Offen
@@ -29,7 +30,8 @@
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
 | Innenraum hinten | Buchsenkörper ragen 20–45 mm nach innen; Platzpläne kollidieren (Ausgabe `platzplan*.py`) | Innenlayout nach DAC-Entscheidung neu: Platinen ≥ 48 mm hinter der Rückwand-Innenseite |
-| Rückwand-Positionen | aus Handbuch-Reihenfolge abgeleitet, kein Maßfoto | mit Foto der Original-Rückseite abgleichen; Cinch/BNC/Klinke/Toslink/IEC-Ausschnitte gegen Datenblatt |
+| Rückwand-Ausschnitte | Cinch/BNC/Klinke/Toslink/HDMI/USB/RJ45/IEC nach typischen Maßen | gegen Datenblatt der bestellten Teile prüfen |
+| Gehäusehöhe | Rückseitenfoto (Maßstab Breite 430): Korpus ca. 73 mm + Füße ca. 9 mm; wir haben H = 88 ohne Füße | Datenblatt 88 vermutlich inkl. Füße → mit zweiter Quelle prüfen, betrifft Front/Displays (DFR0524 71 mm hoch) |
 
 ## Bezug Kernbauteile (Stand 11/2026, Variante AK-Eigenbau – nur falls doch eigene DAC-Platine)
 

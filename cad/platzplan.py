@@ -44,7 +44,7 @@ def solid(x0, x1, z0, z1, h, rund):
     return (cq.Workplane("XY").box(x1 - x0, h, z0 - z1, centered=False).translate((x0, FLOOR + 0.5, z1)))
 
 
-housing = {"Front": f.make_frame(), "Deckel": f.make_cover(), "Boden": f.make_bottom(), "Rückwand": f.make_rear_panel(),
+housing = {"Front": f.make_frame(), "Deckel": f.make_cover(), "Boden": f.make_bottom(), "Rückwand": f.make_rear_panel(), "Querleiste o": f.make_crossbar(True), "Querleiste u": f.make_crossbar(False),
            "Seite R": f.make_side_panel(1), "Seite L": f.make_side_panel(-1)}
 asm = cq.Assembly()
 hits = []

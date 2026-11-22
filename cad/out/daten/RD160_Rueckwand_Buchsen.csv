@@ -1,17 +1,18 @@
 Pos;Gravur;Bauteil;v [mm];y [mm];Ausschnitt;Tiefe innen [mm]
-1;BREAKER;E-T-A 1658-G21-02-P10-2A (Gewinde 3/8-27, D-Fläche);-180;18.0;Ø9.6 / Fläche 8.9;30
-2;GND;Polklemme 4 mm, isoliert;-158;18.0;Ø6.5;20
-3;TRIGGER IN;Klinke 3,5 mm Einbau (Lumberg 1503 09 o. ä.);-138;18.0;Ø6.2;20
-4;OUT;Klinke 3,5 mm Einbau;-122;18.0;Ø6.2;20
-5;R;Cinch Einbau isoliert, Wand ≤ 5 mm;-80;18.0;Ø10.0;28
-6;L;Cinch Einbau isoliert;-40;18.0;Ø10.0;28
-7;AES/EBU;Neutrik NC3FD-L-1 (XLR-Buchse);10;18.0;Ø24 + 2× M3 diagonal 19×24;35
-8;COAX 1;Cinch Einbau isoliert;55;18.0;Ø10.0;28
-9;COAX 2;BNC 75 Ω Einbau isoliert;85;18.0;Ø9.7;28
-10;AC IN ~;Kaltgeräte C14 mit Sicherung, Schraubbef. 40 mm;-165;-22.0;27.8×20.0 + 2× Ø3,2 Abst. 40;40
-11;SVC (LAN);Neutrik NE8FDP (RJ45-Durchführung → Pi 5);-120;-22.0;Ø24 + 2× M3 diagonal 19×24;45
-12;R;Neutrik NC3MD-L-1;-80;-22.0;Ø24 + 2× M3 diagonal 19×24;35
-13;L;Neutrik NC3MD-L-1;-40;-22.0;Ø24 + 2× M3 diagonal 19×24;35
-14;OPTICAL;Toslink-Einbaubuchse mit Kabel (Typ festlegen);10;-22.0;10.5×10.5 + 2× M3 Abst. 20;30
-15;I2S;Neutrik NAHDMI-W-B (HDMI-Durchführung);55;-22.0;Ø24 + 2× M3 diagonal 19×24;45
-16;USB;Neutrik NAUSB-W-B (USB-B-Durchführung);95;-22.0;Ø24 + 2× M3 diagonal 19×24;45
+1;CIRCUIT BREAKER;E-T-A 1658-G21-02-P10-2A (3/8-27, D-Fläche);-184.5;13.0;Ø9.6 / Fläche 8.9;30
+2;GND;Polklemme 4 mm vergoldet, isoliert;-155.7;9.5;Ø6.5;20
+3;POWER / AC INPUT;Kaltgeräte C14 mit Sicherung, Schraubbef. 40 mm;-174.1;-10.0;27.8×20.0 + 2× Ø3,2 Abst. 40;40
+4;BALANCED R;Neutrik NC3MD-L-1;-95.8;-8.2;Ø24 + 2× M3 diagonal 19×24;35
+5;UNBALANCED R;Cinch Einbau isoliert, Wand ≤ 5 mm;-64.9;-8.2;Ø10.0;28
+6;TRIGGER IN;Klinke 3,5 mm Einbau;-39.0;9.7;Ø6.2;20
+7;TRIGGER OUT;Klinke 3,5 mm Einbau;-39.0;-6.5;Ø6.2;20
+8;SVC PORT;USB-C Einbaubuchse mit Kabel → RP2040 (Firmware);-39.2;-19.3;9.6×3.9;30
+9;AES/EBU INPUT;Neutrik NC3FD-L-1;-13.8;-7.2;Ø24 + 2× M3 diagonal 19×24;35
+10;COAX.1 IN;Cinch Einbau isoliert;13.4;9.7;Ø10.0;28
+11;OPTICAL IN;Toslink-Einbaubuchse, Winkel an M3 oben;13.4;-14.9;9.5×10.0 + 1× M3;30
+12;COAX.2 IN;BNC 75 Ω Einbau isoliert;37.1;9.7;Ø9.7;28
+13;I2S INPUT;HDMI-Einbaubuchse mit Kabel, Winkel an M3 oben;37.1;-17.1;16.0×7.0 + 1× M3;45
+14;PC AUDIO IN;USB-B Einbaubuchse mit Kabel;61.4;-15.1;12.5×11.0;40
+15;LAN;RJ45-Kupplung Einbau → Pi 5 (an Stelle SFP);85.5;-11.5;16.5×14.0;40
+16;UNBALANCED L;Cinch Einbau isoliert;113.1;-8.2;Ø10.0;28
+17;BALANCED L;Neutrik NC3MD-L-1;144.3;-8.2;Ø24 + 2× M3 diagonal 19×24;35
