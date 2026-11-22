@@ -122,7 +122,7 @@ M3_TAP_D, M3_DRILL_DEPTH, M3_THREAD_DEPTH = 2.5, 7.0, 6.0
 M3_HOLES = {
     "Chassis":       [(-128, 0), (128, 0)],
     "Taster-PCB":    [(x, sy * 26) for x in (-191, -153) for sy in (-1, 1)],   # y26: Abstandsbolzen Ø5 frei vom Flansch (y30)
-    "LED/Encoder-PCB": [(KNOB_X - 30, 24), (KNOB_X - 30, -24), (KNOB_X + 22, -26), (KNOB_X + 8, 27)],
+    "LED/Encoder-PCB": [(KNOB_X - 30, 24), (KNOB_X - 30, -24), (KNOB_X + 22, -25), (KNOB_X + 8, 25)],
     "Panel-Klemmrahmen": [(sx * 127, sy * 25) for sx in (-1, 1) for sy in (-1, 1)],
 }
 
@@ -773,7 +773,7 @@ def make_power_cap():
 
 # ---------------- Knopfplatine (Encoder + LED-Ring + Einschalttaster) ----------------
 PCB_T = 1.6
-PCB_OUTLINE = [(-34, -34.5), (34, -34.5), (34, 16), (37, 16), (37, 34.5), (-34, 34.5)]   # relativ zur Knopfachse
+PCB_OUTLINE = [(-34, -29.0), (34, -29.0), (34, 29.0), (-34, 29.0)]   # relativ zur Knopfachse; H = 78: zwischen den Flanschen (y ±30)
 LED_L, LED_W, LED_H = 3.5, 2.8, 1.9               # PLCC-2 3528, weiß, Top-View
 SOIC_L, SOIC_W, SOIC_H = 4.9, 3.9, 1.5            # AS5600
 
@@ -805,7 +805,7 @@ def make_pcb_parts():
     sw = sw.union(cq.Workplane("XY").workplane(offset=z + 3.5).center(sx, sy).circle(1.75).extrude(SW_H - 3.5))
     parts["Taster_B3F-1000"] = sw
     parts["Stecker_JST-PH_7p_hinten"] = (cq.Workplane("XY").workplane(offset=z - PCB_T - 6.0)
-                                         .center(-16, -30).rect(15.9, 4.5).extrude(6.0))
+                                         .center(-12, -25.5).rect(15.9, 4.5).extrude(6.0))   # innerhalb Platinenkontur (H = 78)
     holes = [(x - KNOB_X, y) for x, y in M3_HOLES["LED/Encoder-PCB"]]
     so = None
     for hx, hy in holes:
@@ -864,6 +864,7 @@ if __name__ == "__main__":
            "Seitenteil_r": make_side_panel(1), "Seitenteil_l": make_side_panel(-1),
            "Deckel": make_cover(), "Boden": make_bottom(), "Rueckwand": make_rear_panel(),
            "Schaum": make_foam(), "Schrauben": make_tab_screws()}
+    chk["Knopfplatine"] = make_knob_pcb().translate((KNOB_X, 0, 0))
     chk["Querleiste_o"] = make_crossbar(True)
     chk["Querleiste_u"] = make_crossbar(False)
     _bu = list(make_rear_connectors().values())
