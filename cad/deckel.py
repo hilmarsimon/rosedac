@@ -150,7 +150,7 @@ a3.set_title(f"C  Hinterkante: M3 von unten durch Wulst in Deckel",
              fontsize=9, loc="left")
 
 notes = [
-    f"FERTIGUNG DECKEL (Bodenblech {f.BOT_T:.0f} mm: Rechteck, ringsum in Nuten von Front, Seitenteilen und Rückwand, 7× Ø3,4 für ISO 7380 M3×6)",
+    f"FERTIGUNG DECKEL (Bodenblech {f.BOT_T:.0f} mm: Rechteck im umlaufenden Absatz von Front, Seitenteilen und Rückwand, unten bündig, 10× Ø3,4 für ISO 7380 M3×6)",
     f"1. EN AW-6061-T6 Platte 5 mm, Zuschnitt {wl:.1f} × {L + f.TONGUE_L:.1f} (inkl. Feder). Planheit ≤ 0,2.",
     "2. Ebene Platte, keine Absätze an den Längsseiten; Kanten oben Fase 0,3.",
     f"3. Vorn: Eckausklinkungen {(wl - wf) / 2:.1f} × {V(z1 - 0.3):.1f}; Feder 2× {_fb - _fa:.1f} breit (ab ±{_fa:.1f}), oben {f.GROOVE_TOP:.0f} abgesetzt, {_tl:.1f} lang.",

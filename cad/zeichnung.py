@@ -166,7 +166,7 @@ def sheet2(pdf):
         f"   Seitenwände {f.END_W:.0f} breit, volle Höhe und Tiefe. Laschen waagerecht oben/unten {f.TAB_W:.0f} × {f.TAB_T:.0f} × {f.TAB_L:.0f},",
         f"   {f.TAB_U0:.0f}..{f.TAB_U0 + f.TAB_W:.0f} vom Außenrand; Ø3,4 + Senkung 90° Ø6,6 von außen, Achse {f.T - f.TAB_SCREW_Z:.0f} hinter Front (ISO 10642 M3×{f.SCREW_LEN}).",
         f"   Innenecken Auflage/Seitenwand senkrecht R{f.SEAT_R:.0f} (oben und unten).\n   OBEN: Nut {f.GROOVE_H}×{f.GROOVE_D:.0f} in Bandrückseite, Steg {f.GROOVE_TOP:.0f} darüber (Scheibenfräser Ø{2*f.CUTTER_R:.0f}, Auslauf R{f.CUTTER_R:.0f});\n   Auflage {f.SEAT_L:.0f} tief, {f.SEAT_D} unter Oberkante (Deckel {f.COVER_T:.0f} + Schaum {f.FOAM_C}).",
-        f"   UNTEN: Bodennut {f.BOT_T + f.BOT_CLR:.1f} × {f.BOT_NUT_FRONT:.0f} tief in der Rückseite, {f.BOT_LIP:.0f} über Unterkante, durchgehend (Scheibenfräser).",
+        f"   UNTEN: Absatz {f.BOT_ABS_FRONT:.0f} × {f.BOT_T:.0f} an der Rückseite für das Bodenblech, 3× M3 T6 von unten (x {', '.join(f'{x:.0f}' for x in f.BOT_FL_X)}).",
         "",
         "PLEXIGLASPLATTE (Laserzuschnitt, DXF)",
         f"• {f.PANEL_W:.1f}×{f.PANEL_H:.1f}×{f.PANEL_T:.0f}, R{f.PANEL_R:.1f}, "

@@ -44,10 +44,10 @@ SEAT_R = 3.0                          # senkrechte Innenecken Auflage/Seitenwand
 DECO_W, DECO_D = 0.6, 0.15            # Ziernut im Deckel: Breite, Tiefe (Foto); Lage siehe deco_rect()
 JOINT = DECO_W                        # Fuge Deckel/Boden ↔ Front ringsum = Ziernutbreite: eine durchgehende Linie
 BOT_T = 1.0                           # Bodenblech 1 mm
-BOT_LIP = 1.0                         # Steg unter der Bodennut (Front, Seitenteile, Rückwand): Blech unsichtbar eingesetzt
-BOT_CLR = 0.2                         # Nutspiel über dem Blech
+BOT_LIP = 0.0                         # Bodenblech liegt im Absatz, Unterseite bündig mit der Geräteunterkante
+BOT_CLR = 0.0
 BOT_IN = BOT_LIP + BOT_T + BOT_CLR    # Unterkante Wulst/Lasche/Querleiste über der Geräteunterkante
-BOT_NUT_FRONT, BOT_NUT_SIDE, BOT_NUT_REAR = 5.0, 2.5, 2.0   # Nuttiefen: Front (in z), Seitenwand (in x), Rückwand (in z)
+BOT_ABS_FRONT, BOT_ABS_SIDE, BOT_ABS_REAR = 5.0, 2.5, 2.0   # Absatzbreiten (Tiefe = BOT_T): Front (z), Seitenwand (x), Rückwand (z)
 # Seitenteile (Detailfoto Innenecke): C-Profil = Wand SIDE_T + innen oben/unten Wulst BEAD_W x BEAD_H, Höhe
 # zwischen Deckel und Boden. Deckel (5 mm) und Bodenblech (1 mm) sind ebene Platten über die volle Breite W,
 # liegen auf Wand und Wulst und decken die Seitenteile oben/unten ab (außen bündig). Front <-> Seitenteil: waagerechte Lasche (oben/unten) liegt in einem Absatz der
@@ -263,8 +263,6 @@ def make_bezel():
     for blk in _bezel_corner_blocks(0.0):      # Innenecken Band/Seitenwand R SEAT_R, passend zur Deckel-/Bodenrundung
         b = b.union(blk)
     b = b.cut(_bottom_slot_front())
-    b = b.cut(cq.Workplane("XY").box(2 * RAB_X, H / 2 - RAB_Y - BOT_LIP, BOT_NUT_FRONT + 1, centered=(True, False, False))
-              .translate((0, -H / 2 + BOT_LIP, FL_Z0 - 1)))   # kein Reststeg über der Nut in den unteren Ecken
     for x in BZ_SCREW_X:                       # M2,5 Senkkopf von unten (Unterseite)
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.4, H / 2 - RAB_Y + 0.2, cq.Vector(x, -H / 2 - 0.1, BZ_SCREW_Z),
                                                                cq.Vector(0, 1, 0))))
@@ -274,10 +272,11 @@ def make_bezel():
 
 
 def _bottom_slot_front():
-    """Bodennut in der Front-Rückseite, über die ganze Breite bis in die Seitenteilnut (Scheibenfräser durchgehend)."""
-    xs = W / 2 - SIDE_T + BOT_NUT_SIDE
-    return (cq.Workplane("XY").box(2 * xs, BOT_T + BOT_CLR, BOT_NUT_FRONT + 1, centered=(True, False, False))
-            .translate((0, -H / 2 + BOT_LIP, FL_Z0 - 1)))
+    """Absatz für das Bodenblech an der Unterkante der Front-Rückseite, über die ganze Breite (in Flucht mit dem
+    Absatz der Seitenwände), BOT_T tief, BOT_ABS_FRONT breit."""
+    xs = W / 2 - SIDE_T + BOT_ABS_SIDE
+    return (cq.Workplane("XY").box(2 * xs, BOT_T + 1, BOT_ABS_FRONT + 1, centered=(True, False, False))
+            .translate((0, -H / 2 - 1, FL_Z0 - 1)))
 
 
 def _bezel_corner_blocks(clr):
@@ -305,6 +304,7 @@ def make_carrier():
     reg = reg.union(cq.Workplane("XY").box(2 * (W / 2 - END_W - BZ_CLR), H + 2, zb - z0, centered=(True, True, False))
                     .translate((0, 0, z0)))
     c = _front_body().intersect(reg).cut(_bottom_slot_front())
+    c = c.cut(cq.Workplane("XY").add(cq.Compound.makeCompound(bottom_flange_threads())))
     for blk in _bezel_corner_blocks(BZ_CLR):  # sichtbare Eckausrundung gehört zur Blende
         c = c.cut(blk)
     for x in BZ_SCREW_X:
@@ -552,18 +552,29 @@ def bot_front_points():
     return [(sx * (W / 2 - COVER_SCREW_U), BOT_FRONT_Z) for sx in (1, -1)]
 
 
+BOT_FL_X = (-100.0, 0.0, 100.0)        # Bodenschrauben vorn in den unteren Frontflansch
+
+
+def bot_flange_points():
+    return [(x, FL_Z0 + BOT_ABS_FRONT / 2) for x in BOT_FL_X]
+
+
 def make_bottom():
-    """Bodenblech 1 mm, Rechteck, unsichtbar eingesetzt: ringsum in Nuten (Front vorn, Seitenwände, Rückwand), darunter
-    Steg BOT_LIP. Einschieben von hinten in Seiten- und Frontnut, dann Rückwand aufsetzen. ISO 7380 M3x6 von unten:
-    2 vorn + 2 hinten in die Wulst, 3 in die Querleiste."""
-    c = 0.2                                    # Spiel je Seite in den Nuten
-    xs = W / 2 - SIDE_T + BOT_NUT_SIDE - c
-    z0, z1 = Z_REAR + RP_T - BOT_NUT_REAR + c, FL_Z0 + BOT_NUT_FRONT - c
-    b = cq.Workplane("XY").box(2 * xs, BOT_T, z1 - z0, centered=(True, False, False)).translate((0, -H / 2 + BOT_LIP, z0))
-    for x, z in cover_screw_points() + ql_fix_points() + bot_front_points():   # Ø3,4 für ISO 7380 M3x6 (Linsenkopf)
-        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.7, BOT_T + 0.2, cq.Vector(x, -H / 2 + BOT_LIP - 0.1, z),
+    """Bodenblech 1 mm, Rechteck, von unten in den umlaufenden Absatz gelegt (Front, Seitenwände, Rückwand), Unterseite
+    bündig. ISO 7380 M3x6 von unten: 3 in den Frontflansch, 2 vorn + 2 hinten in die Wulst, 3 in die Querleiste."""
+    c = 0.2                                    # Spiel je Seite im Absatz
+    xs = W / 2 - SIDE_T + BOT_ABS_SIDE - c
+    z0, z1 = Z_REAR + RP_T - BOT_ABS_REAR + c, FL_Z0 + BOT_ABS_FRONT - c
+    b = cq.Workplane("XY").box(2 * xs, BOT_T, z1 - z0, centered=(True, False, False)).translate((0, -H / 2, z0))
+    for x, z in cover_screw_points() + ql_fix_points() + bot_front_points() + bot_flange_points():   # Ø3,4
+        b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.7, BOT_T + 0.2, cq.Vector(x, -H / 2 - 0.1, z),
                                                                cq.Vector(0, 1, 0))))
     return b
+
+
+def bottom_flange_threads():
+    """Gewinde M3 6 tief von unten im unteren Frontflansch (Träger)."""
+    return [cq.Solid.makeCylinder(1.25, 6.0, cq.Vector(x, -H / 2 + BOT_T, z), cq.Vector(0, 1, 0)) for x, z in bot_flange_points()]
 
 
 RIB_N = 10                             # Rippen außen (Foto: ca. 10 über die Höhe)
@@ -574,10 +585,9 @@ RIB_CROWN = 0.6                        # Wölbung der Rippenoberfläche
 
 def side_profile_face(sx):
     """Querschnitt Seitenteil (XY) als Face: C-Profil, außen geriffelt (RIB_N gewölbte Rippen, halbrunde Nuten).
-    Wand bis zur Geräteunterkante, darunter Steg BOT_LIP, Bodennut BOT_NUT_SIDE tief in die Wand, untere Wulst darüber."""
+    Wand bis zur Geräteunterkante, innen unten Absatz BOT_ABS_SIDE × BOT_T für das Bodenblech, untere Wulst darüber."""
     yT, yB = H / 2 - COVER_T, -H / 2
-    yW = -H / 2 + BOT_IN                    # Unterkante untere Wulst
-    yN0, yN1 = -H / 2 + BOT_LIP, -H / 2 + BOT_IN   # Bodennut
+    yW = -H / 2 + BOT_IN                    # Unterkante untere Wulst = Oberseite Bodenblech
     X = lambda u: sx * (W / 2 - u)
     pitch = (yT - yB) / RIB_N
     g, r = RIB_GROOVE_W, RIB_GROOVE_W / 2
@@ -599,8 +609,7 @@ def side_profile_face(sx):
             wp = (wp.lineTo(X(uc), c - r).threePointArc((X(RIB_DEPTH), c), (X(uc), c + r)).lineTo(X(ue), c + r))
             y = c + r
     for u, yy in ((SIDE_W, yT), (SIDE_W, yT - BEAD_H), (SIDE_T, yT - BEAD_H), (SIDE_T, yW + BEAD_H),
-                  (SIDE_W, yW + BEAD_H), (SIDE_W, yN1), (SIDE_T - BOT_NUT_SIDE, yN1), (SIDE_T - BOT_NUT_SIDE, yN0),
-                  (SIDE_T, yN0), (SIDE_T, yB)):
+                  (SIDE_W, yW + BEAD_H), (SIDE_W, yW), (SIDE_T - BOT_ABS_SIDE, yW), (SIDE_T - BOT_ABS_SIDE, yB)):
         wp = wp.lineTo(X(u), yy)
     wire = wp.close().wire().val()
     return cq.Face.makeFromWires(wire)
@@ -685,8 +694,8 @@ def make_rear_panel():
     """Rückwand 4 mm zwischen den Seitenteil-Wänden, hinter den Wulsten: 10 Senkbohrungen M3 + Anschlussausschnitte (RP_CONN)."""
     r = (cq.Workplane("XY").box(W - 2 * SIDE_T - 0.2, RP_YT - RP_YB, RP_T, centered=(True, True, False))
          .translate((0, (RP_YT + RP_YB) / 2, Z_REAR)))
-    r = r.cut(cq.Workplane("XY").box(W, BOT_T + BOT_CLR, BOT_NUT_REAR + 1, centered=(True, False, False))   # Bodennut innen
-              .translate((0, -H / 2 + BOT_LIP, Z_REAR + RP_T - BOT_NUT_REAR)))
+    r = r.cut(cq.Workplane("XY").box(W, BOT_T + 1, BOT_ABS_REAR + 1, centered=(True, False, False))   # Absatz Bodenblech
+              .translate((0, -H / 2 - 1, Z_REAR + RP_T - BOT_ABS_REAR)))
     tools = []
     for v, y in rear_screw_points():
         tools.append(cq.Solid.makeCylinder(1.7, RP_T + 0.2, cq.Vector(-v, y, Z_REAR - 0.1), cq.Vector(0, 0, 1)))

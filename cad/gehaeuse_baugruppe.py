@@ -45,7 +45,7 @@ screws["Deckel_ISO4762_M3x10"] = [screw((x, y_cb, z), 3, 10, 5.5, 3.0, "zyl", UP
                                   for x, z in f.cover_screw_points() + f.ql_fix_points()]
 # Boden: 7× ISO 7380 M3×6 von unten
 screws["Boden_ISO7380_M3x6"] = [screw((x, -f.H / 2 + f.BOT_LIP, z), 3, 6, 5.7, 1.65, "zyl", UP)
-                                for x, z in f.cover_screw_points() + f.ql_fix_points() + f.bot_front_points()]
+                                for x, z in f.cover_screw_points() + f.ql_fix_points() + f.bot_front_points() + f.bot_flange_points()]
 # Blende ↔ Träger: 6× M2,5×6 Senkkopf von unten
 screws["Blende_M2.5x6_Senk"] = [screw((x, -f.H / 2, f.BZ_SCREW_Z), 2.5, 6, 5.0, 1.25, "senk", UP) for x in f.BZ_SCREW_X]
 
@@ -121,7 +121,7 @@ rows = [("Blende", 1, "EN AW-6061, schwarz eloxiert", "RD160_Front_Blende.step")
         ("Tasterkappe", 10, "Alu, eloxiert", "RD160_Tasterkappe.step"),
         ("Einschaltkappe", 1, "Alu, eloxiert", "RD160_Einschaltkappe.step"),
         ("Deckel", 1, "EN AW-6061, 5 mm", "RD160_Deckel.step"),
-        ("Bodenblech", 1, "EN AW-5754, 1 mm, 424,6 × 310,6, ringsum in Nuten", "RD160_Bodenplatte.step"),
+        ("Bodenblech", 1, "EN AW-5754, 1 mm, 424,6 × 310,6, im umlaufenden Absatz, unten bündig", "RD160_Bodenplatte.step"),
         ("Seitenteil rechts/links", 2, "EN AW-6061, schwarz eloxiert", "RD160_Seitenteil_*.step"),
         ("Rückwand", 1, "EN AW-6061, 4 mm, schwarz eloxiert, Gravur", "RD160_Rueckwand.step/.dxf"),
         ("Querleiste oben/unten", 2, "Alu-Flachstange 10×10", "RD160_Querleiste_*.step"),
