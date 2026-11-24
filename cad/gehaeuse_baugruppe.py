@@ -127,7 +127,7 @@ rows = [("Blende", 1, "EN AW-6061, schwarz eloxiert", "RD160_Front_Blende.step")
         ("Tasterkappe", 10, "Alu, eloxiert", "RD160_Tasterkappe.step"),
         ("Einschaltkappe", 1, "Alu, eloxiert", "RD160_Einschaltkappe.step"),
         ("Deckel", 1, "EN AW-6061, 5 mm", "RD160_Deckel.step"),
-        ("Bodenblech", 1, "EN AW-5754, 1 mm, 424,6 × 310,6, im umlaufenden Absatz, unten bündig", "RD160_Bodenplatte.step"),
+        ("Bodenblech", 1, "EN AW-5754, 1 mm, 424,6 × 314,6, im umlaufenden Absatz, unten bündig", "RD160_Bodenplatte.step"),
         ("Seitenteil rechts/links", 2, "EN AW-6061, schwarz eloxiert", "RD160_Seitenteil_*.step"),
         ("Rückwand", 1, "EN AW-6061, 4 mm, schwarz eloxiert, Gravur", "RD160_Rueckwand.step/.dxf"),
         ("Querleiste oben/unten", 2, "Alu-Flachstange 10×10", "RD160_Querleiste_*.step"),

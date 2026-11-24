@@ -50,7 +50,7 @@ BOT_T = 1.0                           # Bodenblech 1 mm
 BOT_LIP = 0.0                         # Bodenblech liegt im Absatz, Unterseite bündig mit der Geräteunterkante
 BOT_CLR = 0.0
 BOT_IN = BOT_LIP + BOT_T + BOT_CLR    # Unterkante Wulst/Lasche/Querleiste über der Geräteunterkante
-BOT_ABS_FRONT, BOT_ABS_SIDE, BOT_ABS_REAR = 5.0, 2.5, 2.0   # Absatzbreiten (Tiefe = BOT_T): Front (z), Seitenwand (x), Rückwand (z)
+BOT_ABS_FRONT, BOT_ABS_SIDE, BOT_ABS_REAR = 9.0, 2.5, 2.0   # Absatzbreiten (Tiefe = BOT_T): Front (z, Flanschrückseite bis Blendenband), Seitenwand (x), Rückwand (z)
 # Seitenteile (Detailfoto Innenecke): C-Profil = Wand SIDE_T + innen oben/unten Wulst BEAD_W x BEAD_H, Höhe
 # zwischen Deckel und Boden. Deckel (5 mm) und Bodenblech (1 mm) sind ebene Platten über die volle Breite W,
 # liegen auf Wand und Wulst und decken die Seitenteile oben/unten ab (außen bündig). Front <-> Seitenteil: waagerechte Lasche (oben/unten) liegt in einem Absatz der
@@ -644,7 +644,7 @@ BOT_FL_X = (-125.0, 0.0, 125.0)        # Bodenschrauben vorn in den unteren Fron
 
 
 def bot_flange_points():
-    return [(x, FL_Z0 + BOT_ABS_FRONT / 2) for x in BOT_FL_X]
+    return [(x, FL_Z0 + 4.0) for x in BOT_FL_X]     # z -1,5: Gewinde frei von der Displaytasche (z ≥ 0), Blechrand 3,1
 
 
 def make_bottom():
