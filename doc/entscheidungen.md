@@ -4,14 +4,14 @@
 
 | Thema | Entscheidung | Grund |
 |---|---|---|
-| Display | 2× DFRobot DFR0524 5,5" AMOLED (HDMI) am Pi 5 | Größe passend zur Front, echtes Schwarz hinter Dead-Front |
-| Gehäusehöhe | H = 78 mm ohne Füße (Original laut Front-/Rückseitenfoto ca. 74 + ca. 9 mm Füße; Datenblatt 88 inkl. Füße) | +4 mm, damit die DFR0524 (71 mm) passen; Alternative 6,52" AMOLED PO652F2K bei H = 74 verworfen (Kosten, Board offen) |
-| Front | zweiteilig: Blende (Alu, Lippe 1,5 + Fase 0,4, Rand 4, Wände 2,5, Ecken hinter dem Band) + Träger (Alu, Displaytasche, Taster, Knopflager, Flansche, Laschen); Plexiglas 424,4 × 72,4 × 3 von hinten eingelegt, 1,2 unter der Lippe, 0,3 Dehnspalt, über Poron geklemmt, nicht geklebt | keine sichtbare Fuge Platte/Rahmen; Frontdicke T = 13,5 (Plattenfront 1,5 zurückgesetzt) |
+| Display | 2× Waveshare 5,5" HDMI AMOLED 1080×1920 am Pi 5, quer, Stoß bei x 0,5, HDMI-/USB-Buchse unten; Deckglas 140,4 × 74,76 R4 liegt an der Platte; je 3 Bolzen mit ISO 10642 M2,5×8 von hinten durch die Flansche (Silikonscheibe 0,5 im Spalt 0,3); unterer Flansch je Display für Winkelstecker ausgespart | DFR0524 (Deckglas 138,2 × 81) bräuchte H = 88; echtes Schwarz hinter Dead-Front; Zeichnung/STEP in `doc/datenblaetter/` |
+| Gehäusehöhe | H = 82 mm ohne Füße (Original laut Fotos ca. 74 + ca. 9 mm Füße; Datenblatt 88) | Deckglas Waveshare 74,76 + Tasche/Wände; Flansch 11 hoch, Innenkante y ±30 wie zuvor. H = 78 verworfen (DFR0524-Maß war die Platine, nicht das Glas) |
+| Front | zweiteilig: Blende (Alu, Lippe 1,5 + Fase 0,4, Rand 4, Wände 2,5, Ecken hinter dem Band) + Träger (Alu, Displaytasche, Taster, Knopflager, Flansche, Laschen); Plexiglas 424,4 × 76,4 × 3 von hinten eingelegt, 1,2 unter der Lippe, 0,3 Dehnspalt, über Poron geklemmt, nicht geklebt | keine sichtbare Fuge Platte/Rahmen; Frontdicke T = 13,5 (Plattenfront 1,5 zurückgesetzt) |
 | Blende ↔ Träger | 6× M2,5 Senkkopf von unten (Unterseite); oben hält der Ring über die Seitenwände, Deckelfeder drückt von unten an den Nutsteg der Blende | oben keine sichtbaren Schrauben möglich (Platte muss von hinten durch) |
 | Bodenblech | Rechteck 424,6 × 310,6 × 1, von unten in einen umlaufenden Absatz gelegt (Front 5, Seitenwände 2,5, Rückwand 2 breit, 1 tief), Unterseite bündig; 10× ISO 7380 M3×6 (3 Frontflansch, 4 Wulst, 3 Querleiste) | Front, Seiten und Rückwand bis zur Unterkante; Blech von vorn/seitlich/hinten unsichtbar |
 | Ziernut / Ecke Deckel–Front | Ziernut 0,6 × 0,15 vorn entlang dem Stoß, seitlich 0,9 breit bis hinten offen, Innenecke R0,2; Fuge 0,3; Blende-Innenecke R0,5 (Fräser Ø1) | nach Bildvergleich (je Variante 2) |
 | Testfront | bleibt einteilig, Platte von vorn in Fenstergröße 1,5 zurückgesetzt (Fuge dort sichtbar) | nur Optik-/Funktionstest |
-| Deckelnut/Feder | nur links und rechts der Displaytasche (zwei Abschnitte mit Fräserauslauf) | bei H = 78 reicht die Displaytasche bis y 36, Nut läge darin |
+| Deckelnut/Feder | nur links und rechts der Displaytasche (zwei Abschnitte mit Fräserauslauf) | Displaytasche reicht bis y 37,7, Nut läge darin |
 | Front-Abdeckung | Plexiglas vollflächig, Musterplatten 9H04 SC und 7H25 GT im Test vergleichen | Dead-Front-Optik wie Original |
 | Rahmen-Oberfläche | Glasperlstrahlen + Eloxal schwarz | Originaloptik |
 | Deckelhalterung vorn | Nut im Band (Scheibenfräser), einseitige Feder am Deckel, Schaumstoff darunter | keine sichtbaren Schrauben |
@@ -33,8 +33,8 @@
 | DAC | **Entschieden 11/2026:** AckoDAC AKD49S (AK4191 + AK4499EX, I-V onboard, ±15 V) + Ian Canada ReceiverPi DDC II + FifoPi Q7 III (Reclocking, MCLK) + PurePi II; Eigenbau: Steuer-, Taster-, Knopfplatine, kleine Eingangsplatine (Relais-Mux Coax 1/2 + AES-Übertrager) | wenig Eigenentwicklung, AK4499EX-Klang; Variante IC-DAC (ES9038Q2M) verworfen |
 | Acko-Klärung | Platinenmaße/Bohrbild, Ströme ±15 V, I²S-Direkteingang + ext. MCLK (Pegel, Frequenz vom FifoPi), Ausgänge als Stiftleiste statt XLR/Cinch, I²C-API für RP2040 | Anfrage an Acko, Platzhalter 175 × 102 im Platzplan |
 | Eingänge/Takt | Ian Canada ReceiverPi DDC II + FifoPi Q7 III | in beiden Varianten gesetzt |
-| **Display passt nicht** | Hersteller-DXF `doc/datenblaetter/DFR0524.dxf`: Deckglas 138,2 × 81, R7; aktiv 120,6 × 67,8 (mittig); Platine 124 × 71 (bisher fälschlich als Außenmaß angesetzt). Bei H = 78 Tasche nur 72 hoch. Waveshare 5" (Deckglas ca. 80 hoch) und 5,5" ebenfalls zu hoch. Waveshare 5,5" HDMI AMOLED (`doc/datenblaetter/Waveshare_5.5inch_HDMI_AMOLED.pdf`): Deckglas 140,4 × 74,76, R4, VA 121,76 × 68,7 mittig (Rand 9,32 / 3,03), Platine 130 × 70,5, Dicke 4,7 (Glas+Modul) / 8,7 (mit Bauteilen), 8× M2,5. Optionen: (a) DFR0524 + H = 88, (b) Waveshare 5,5" + H = 82, (c) H = 78 mit nacktem Panel, (d) Deckglas besäumen (riskant) | Empfehlung (b): kleinste Höhenänderung, gleiche Auflösung; Breite 2 × 140,4 lässt zum Knopfring noch ca. 1,6 mm; Entscheidung offen |
-| Displaymodul-Dicke | Annahme 3 mm (`DISP_T` in `cad/testfront.py`) | am gewählten Display messen |
+| Display-Anschluss | HDMI und USB (Versorgung, ca. 0,65 A bei Weiß) zeigen nach unten; im Gerät nur Winkelstecker (90°, nach hinten) möglich, Freiraum ca. 9 mm unter der Buchse | passende Winkelstecker/FPC-Kabel auswählen und gegen den Freischnitt prüfen; Helligkeit nur per Taster am Modul (5 Stufen) – Dimmen in der UI per Software |
+| Displaymodul-Dicke | aus STEP: Glas–Bolzenende 8,7, Buchse 11,0 | am Modul nachmessen (Spalt Bolzen/Flansch 0,3) |
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
 | Innenraum | Platzplan `cad/platzplan.py`: Netz/Trafos rechts, AKD49S mittig hinten zwischen den Ausgängen L/R, IC-Stapel rechts hinten, Pi 5 + Steuerung vorn links; Platinen ≥ 49 mm vor der Rückwand-Innenseite | keine Kollisionen (Gehäuse, Buchsen, Platzhalter untereinander) |

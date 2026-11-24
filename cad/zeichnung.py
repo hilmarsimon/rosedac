@@ -10,7 +10,17 @@ import frontplatte as f
 OUTDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
 A3 = (16.54, 11.69)
 LW = 0.7
-MARK = {"Chassis": "A", "Taster-PCB": "B", "LED/Encoder-PCB": "C", "Panel-Klemmrahmen": "D"}
+MARK = {"Chassis": "A", "Taster-PCB": "B", "LED/Encoder-PCB": "C", "Display": "D"}
+SPEC = {"Chassis": "M3 T4 von hinten in Flansch, Kernloch Ø2,5 T5", "Taster-PCB": "M3, T6, Kernloch Ø2,5 T7",
+        "LED/Encoder-PCB": "M3, T6, Kernloch Ø2,5 T7", "Display": "Ø2,7 durch Flansch, Senkung 90° Ø5,2 von hinten"}
+
+
+def all_holes():
+    """Name -> Punkte (Vorderansicht): Träger-Rückseite + Flanschrückseite."""
+    d = dict(f.M3_HOLES)
+    d["Chassis"] = f.CHASSIS_PTS
+    d["Display"] = f.DISP_SCREW_PTS
+    return d
 
 
 def rr(ax, cx, cy, w, h, r, **kw):
@@ -107,7 +117,7 @@ def rear_view(ax):
         c, s = math.cos(math.radians(a)), math.sin(math.radians(a))
         for o in (-f.BRIDGE_W / 2, f.BRIDGE_W / 2):
             ax.plot([kx + r1 * c - o * s, kx + r2 * c - o * s], [r1 * s + o * c, r2 * s + o * c], lw=LW, color="k")
-    for k, pts in f.M3_HOLES.items():
+    for k, pts in all_holes().items():
         for x, y in pts:
             ax.add_patch(Circle((m * x, y), 1.5, fill=False, lw=LW))
             ax.plot([m * x - 2.2, m * x + 2.2], [y, y], lw=0.3, color="0.3")
@@ -120,7 +130,7 @@ def rear_view(ax):
          f"Lagersitz Ø{f.BEARING_D:.0f} H7, T {f.BEARING_DEPTH:.0f} (6805-2RS)\n"
          f"Lichttasche Ø{f.LIGHT_ID:.0f}/Ø{f.LIGHT_OD:.0f}, T {f.LIGHT_DEPTH:.0f}, 4 Stege {f.BRIDGE_W:.0f} mm")
     ax.text(-f.W / 2, -f.H / 2 - 22,
-            "A–D: M3 Sackloch, Kernloch Ø2,5 T7, Gewinde T6 (Tabelle Blatt 2)", fontsize=6.5)
+            "A–C: M3 Sackloch, D: Displaybefestigung M2,5 (Tabelle Blatt 2)", fontsize=6.5)
     ax.set_title("ALU-RAHMEN – RÜCKANSICHT (Blick von hinten, gespiegelt)", fontsize=9, loc="left")
 
 
@@ -139,8 +149,8 @@ def sheet1(pdf):
 
 def sheet2(pdf):
     fig = plt.figure(figsize=A3)
-    rows = [[MARK[k], k, f"{x:+.1f}", f"{y:+.1f}", "M3, T6, Kernloch Ø2,5 T7"]
-            for k, pts in f.M3_HOLES.items() for x, y in pts]
+    rows = [[MARK[k], k, f"{x:+.1f}", f"{y:+.1f}", SPEC[k]]
+            for k, pts in all_holes().items() for x, y in pts]
     ax = fig.add_axes([0.03, 0.40, 0.45, 0.55]); ax.axis("off")
     tb = ax.table(cellText=rows, colLabels=["Pos", "Zweck", "X (Front)", "Y", "Gewinde"], loc="upper left",
                   cellLoc="left", colWidths=[0.07, 0.30, 0.15, 0.12, 0.36])
@@ -152,7 +162,7 @@ def sheet2(pdf):
         f"1. EN AW-6061-T6, Rohteil {f.W:.0f} × {f.H:.0f} × {f.DEPTH + f.TAB_L:.0f} mm. Glasperlstrahlen fein (alle Flächen inkl. Taschenböden),",
         "   danach Eloxal Typ II schwarz matt, verdichtet. Schichtdicke 10–15 µm.",
         f"   ABDECKEN (nicht eloxieren): Lagersitz Ø{f.BEARING_D:.0f} H7 + Bohrung Ø{f.SHAFT_HOLE_D:.0f}; Ringfläche Ø8 um die 6 Bohrungen A",
-        "   auf der Rückseite (Masseverbindung zum Chassis). Gewinde M3 dürfen eloxiert sein.",
+        "   auf der Flanschrückseite (Masseverbindung zum Chassis). Gewinde M3 dürfen eloxiert sein.",
         f"2. Außenkanten vorn Fase {f.EDGE_CHAMFER}×45°, sonst gratfrei.",
         f"3. BLENDE: Fenster {f.POCKET_W:.0f}×{f.POCKET_H:.0f} R{f.FRAME_R:.0f} in Lippe {f.LIP_T}, Fase {f.LIP_CH}×45° vorn; Falz von hinten "
         f"{2 * f.RAB_X:.1f}×{2 * f.RAB_Y:.1f} R{f.RAB_R:.1f}\n   durch bis hinten (Wand {f.W / 2 - f.RAB_X:.1f}); Ecken oben/unten hinter dem Band bleiben stehen. "
@@ -177,8 +187,9 @@ def sheet2(pdf):
         "• Rückseite außerhalb Display und Ring nicht hell lackieren – Alu dahinter ist schwarz.",
         "",
         "ÜBRIGE TEILE",
-        "• Display: 2× DFRobot DFR0524 5,5\" AMOLED (HDMI), quer, Stoß in X=0, Outline je 124×71.",
-        "  Klemmrahmen (D) drückt über Moosgummi gegen die Platte. Module vorher nachmessen.",
+        f"• Display: 2× Waveshare 5,5\" HDMI AMOLED, quer, Stoß in X={f.DISP_X}, Deckglas je {f.DISP_GW}×{f.DISP_GH} R{f.DISP_GR:.0f}, Glas an der Platte.",
+        "  Je 3 Bolzen (D) mit ISO 10642 M2,5×8 von hinten durch die Flansche, Silikonscheibe 0,5 im Spalt 0,3 (Vorspannung).",
+        f"  Unterer Flansch je Display ausgespart (x' {f.DISP_NOTCH_X[0]:.0f}..{f.DISP_NOTCH_X[1]:.0f}) für Winkelstecker HDMI/USB.",
         f"• Tasterkappe 10× Alu: Stößel Ø3×4,2, Bund Ø8,6×1,5, Schaft Ø6×{f.CARRIER_T + f.PANEL_T - f.BTN_CB_DEPTH + 1.5:.1f}.",
         "  Omron B3F-1000 auf PCB, Abstandsbolzen M3×5 an Pos. B.",
         "• Drehknopf: Becher mit Nabe Ø25 k6 in 6805-2RS, Haltescheibe hinten; O-Ring 26×2 + Nyogel = Dämpfung.",

@@ -73,7 +73,7 @@ txt = (f"Verhältnisse Nachbau\n"
        f"Überstand / Knopf-Ø       ≈ 0,23 (Draufsicht-Foto: ca. 11,5 mm)\n\n"
        f"Folgerung: Überstand 12 mm. Original-Korpus ca. 70–74 mm\n"
        f"(88 mm Datenblatt inkl. Füße). Nachbau H = {H:.0f} mm, damit\n"
-       f"die DFR0524 (71 mm) hineinpassen (+4 mm zum Original).")
+       f"das Deckglas der Waveshare 5,5\" ({f.DISP_GH} mm) hineinpasst.")
 fig.text(0.50, 0.93, txt, fontsize=10.5, va="top", family="DejaVu Sans Mono")
 
 # 3D-Ansichten einsetzen

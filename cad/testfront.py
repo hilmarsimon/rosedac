@@ -1,8 +1,8 @@
 """Druckbare Testfront 1:1 für Display-, Plexiglas- und Reglertest (ohne DAC).
-Basis ist der echte Träger aus frontplatte.py (nur Z 0..T, ohne Flansche/Seitenwände/Laschen), geteilt bei X = 0
+Basis ist der echte Träger aus frontplatte.py (Z FL_Z0..T: mit Flanschen für die Displayschrauben, ohne Laschen), geteilt bei X = 0
 in zwei Hälften (Druckbett ≥ 220 mm). Änderungen für den Druck: Gewinde M3 -> Aufnahme für Einschmelzmuttern,
-Passstifte Ø3 an der Trennfläche. Dazu: Displayklammern, Sensor-/LED-Halter statt Knopfplatine, halbe
-Plexiglasplatten als DXF, Knopfteile als STL.  Druck: Rückseite (Z = 0) aufs Bett, Front oben."""
+Passstifte Ø3 an der Trennfläche. Displays mit M2,5×8 von hinten durch die Flansche in ihre Bolzen. Dazu: Sensor-/LED-Halter statt Knopfplatine, halbe
+Plexiglasplatten als DXF, Knopfteile als STL.  Druck: Front aufs Bett (Stützen in der Fenstertasche) oder CNC aus POM (empfohlen)."""
 import os, math
 import cadquery as cq
 import frontplatte as f
@@ -13,34 +13,25 @@ W, H, T = f.W, f.H, f.T
 
 INSERT_D, INSERT_L = 4.0, 6.0          # M3-Einschmelzmutter (Ruthex M3×5,7: Bohrung Ø4,0)
 DOWEL_L = 8.0                           # Passstifte je Seite 8 tief
-DOWEL_PTS = [(-34.0, -2.75, 3.1), (37.2, 11.25, 2.1)]   # (Y, Z, Ø): unten im Flansch Ø3, oben im Steg über dem Fenster Ø2
-DISP_T = 3.0                            # Annahme Dicke Displaymodul (Glas+Folie) – am echten Modul messen!
-CLAMP_GAP = 0.5                         # Luft Klammerfinger -> Display (Schaumstoff 1 mm dazwischen)
+DOWEL_PTS = [(-36.0, -2.75, 3.1), (39.0, 11.25, 2.1)]   # (Y, Z, Ø): unten im Flansch Ø3, oben im Steg über dem Fenster Ø2
 
 
 def plate():
     # Testfront einteilig: Platte von vorn in Fenstergröße, 1,5 zurückgesetzt (Optik wie hinter der Lippe, Fuge sichtbar)
-    body = f.make_front_onepiece().intersect(cq.Workplane("XY").box(W + 2, H + 2, T, centered=(True, True, False)))
+    body = f.make_front_onepiece().intersect(cq.Workplane("XY").box(W + 2, H + 2, T - f.FL_Z0, centered=(True, True, False))
+                                             .translate((0, 0, f.FL_Z0)))
     pts = [pt for v in f.M3_HOLES.values() for pt in v]
     body = body.cut(cq.Workplane("XY").pushPoints(pts).circle(INSERT_D / 2).extrude(INSERT_L))
     return body
 
 
 def half(sx):
-    b = plate().intersect(cq.Workplane("XY").box(W / 2 + 1, H + 2, T + 2, centered=(False, True, False))
-                          .translate((-(W / 2 + 1) if sx < 0 else 0, 0, -1)))
+    b = plate().intersect(cq.Workplane("XY").box(W / 2 + 1, H + 2, T - f.FL_Z0 + 2, centered=(False, True, False))
+                          .translate((-(W / 2 + 1) if sx < 0 else 0, 0, f.FL_Z0 - 1)))
     for y, z, d in DOWEL_PTS:
         b = b.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(d / 2, DOWEL_L, cq.Vector(0, y, z),
                                                                cq.Vector(sx, 0, 0))))
     return b
-
-
-def display_clamp():
-    """Klammer an den Panel-Klemmrahmen-Bohrungen (±127, ±25): Lasche 14×12×3 mit Finger in die Displaytasche."""
-    finger = f.CARRIER_T - DISP_T - CLAMP_GAP      # vom Trägerrücken bis kurz vor das Display
-    c = cq.Workplane("XY").box(14, 12, 3, centered=(True, True, False)).translate((0, 0, -3))
-    c = c.union(cq.Workplane("XY").box(5, 10, finger, centered=(True, True, False)).translate((-5.5, 0, 0)))
-    return c.cut(cq.Workplane("XY").circle(1.7).extrude(10).translate((0, 0, -5)))
 
 
 def sensor_holder():
@@ -76,7 +67,7 @@ def panel_half(sx):
 
 
 if __name__ == "__main__":
-    parts = {"Testfront_links": half(-1), "Testfront_rechts": half(1), "Displayklammer": display_clamp(),
+    parts = {"Testfront_links": half(-1), "Testfront_rechts": half(1),
              "Sensorhalter_Knopf": sensor_holder(),
              "Knopf_Becher": f.make_knob_shell(), "Knopf_Lichtleiter": f.make_light_tube(),
              "Knopf_Konus": f.make_cone_insert(), "Knopf_Haltescheibe": f.make_washer(),

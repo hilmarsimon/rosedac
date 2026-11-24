@@ -8,7 +8,7 @@ Alles hier wird später im Gerät weiterverwendet.
 | Teil | Menge | Hinweis |
 |---|---|---|
 | Raspberry Pi 5 (4 GB reicht) + offizielles 27-W-Netzteil + microSD 32 GB | 1 | Pi OS Lite 64 bit |
-| DFRobot DFR0524 5,5" AMOLED 1080×1920 (HDMI) | 2 | je ein Micro-HDMI-auf-HDMI-Kabel bzw. Adapter |
+| Waveshare 5,5" HDMI AMOLED 1080×1920 | 2 | je Micro-HDMI-auf-HDMI (im Gerät Winkelstecker) + USB-Kabel zur Versorgung (Pi-USB) |
 | PLEXIGLAS LED Black & White 9H04 SC (matt), 3 mm | 1 Muster ≥ 210 × 160 | ergibt 2 Testhälften (DXF) |
 | PLEXIGLAS LED Black & White 7H25 GT (glänzend), 3 mm | 1 Muster ≥ 210 × 160 | Vergleich |
 | Raspberry Pi Pico (RP2040) | 1 | MicroPython |
@@ -20,19 +20,18 @@ Alles hier wird später im Gerät weiterverwendet.
 | Taster 6 × 6 (z. B. Omron B3F-1000) | 11 | 10 Bedientaster + Einschalttaster |
 | Einschmelzmuttern M3 (Ruthex M3 × 5,7) | 16 | |
 | Schrauben M3 × 8 / M3 × 12, Passstifte Ø3 × 15 | je 10 / 2 | |
-| Schaumstoff 1 mm selbstklebend | Rest | zwischen Klammer und Display |
+| ISO 10642 M2,5×8 + Silikonscheibe 0,5 | 6 | Displays durch die Flansche in ihre Bolzen |
 | Dämpfungsfett (Nyogel 767A oder ähnlich) | wenig | Drehgefühl |
 
 ## 2. Druckteile (STL + STEP in `cad/out/cad/testfront/`, DXF in `cad/out/dxf/testfront/`; erzeugt von `cad/testfront.py`)
 
-**Testfront einteilig (empfohlen):** `Testfront_einteilig_CNC.step` (430 × 78 × 12) bei JLCCNC aus **POM schwarz** fräsen lassen,
+**Testfront einteilig (empfohlen):** `Testfront_einteilig_CNC.step` (430 × 82) bei JLCCNC aus **POM schwarz** fräsen lassen,
 M3-Gewinde direkt in POM (Gewinde in der Bestellung angeben). Alternativ `Testfront_einteilig_Druck.stl/.step` (Ø4 für Einschmelzmuttern)
 bei einem Druckdienst mit Bauraum ≥ 440 mm (SLA-Harz schwarz). Zweiteilige Druckversion nur für eigene Drucker < 440 mm.
 
 | Datei | Material | Ausrichtung |
 |---|---|---|
-| Testfront_links / Testfront_rechts (je 215 × 78 × 12) | PETG schwarz, 0,2 mm, 4 Wände | Rückseite aufs Bett |
-| Displayklammer (4×) | PETG | Lasche aufs Bett |
+| Testfront_links / Testfront_rechts (je 215 × 82) | PETG schwarz, 0,2 mm, 4 Wände | Front aufs Bett, Stützen in der Fenstertasche |
 | Sensorhalter_Knopf | PETG | flache Seite aufs Bett |
 | Knopf_Becher, Knopf_Konus, Knopf_Haltescheibe | PLA/PETG (Alu später CNC) | Öffnung nach oben |
 | Knopf_Lichtleiter | klares Harz (SLA) oder klares PETG | stehend |
@@ -46,7 +45,7 @@ Lagersitz Ø37 nach dem Druck mit Schleifpapier auf Presssitz bringen.
 1. Einschmelzmuttern in alle Ø4-Bohrungen der Rückseite setzen.
 2. Hälften mit Passstiften Ø3 und etwas Sekundenkleber verbinden; Front plan auf eine Glasplatte drücken.
 3. Plexiglashälften in die Fronttasche legen (vorerst nur mit 2 Streifen Kapton-Band halten – Muster tauschbar).
-4. Displays von hinten in die Displaytaschen, aktive Fläche Richtung Front; mit den 4 Displayklammern (1 mm Schaumstoff auf dem Finger) an den Bohrungen ±127/±25 halten. **Dicke des Displaymoduls messen** und ggf. `DISP_T` in `testfront.py` anpassen.
+4. Displays von hinten in die Displaytaschen, Glas Richtung Front, HDMI-/USB-Buchse unten; je 3× M2,5×8 von hinten durch die Flansche in die Bolzen (Silikonscheibe dazwischen). **Abstand Glasfront–Bolzenende messen** (STEP: 8,7; Tasche 9,0).
 5. Knopf: O-Ring in die Nut, Lager einpressen, Becher mit Lichtleiter und Konus einsetzen, Magnet in die Nabe kleben (Klebstoff, Polung egal), Haltescheibe mit 3× M2,5 von hinten.
 6. Sensorhalter: AS5600-Breakout (Chip nach vorn) in die Tasche, 12 LEDs von hinten in den Lichtkreis, Einschalttaster einsetzen; mit 4× M3 × 12 an den Träger. Abstand Chip–Magnet ≈ 2,5 mm.
 
@@ -72,6 +71,7 @@ mkdir -p ~/rd160 && cp test/pi/rd160_ui.py ~/rd160/
 # Test von Hand (Konsole, kein Desktop):
 SDL_VIDEODRIVER=kmsdrm python3 ~/rd160/rd160_ui.py
 # Hochformat-Displays quer: falls Bild gedreht -> --rotate 90 (oder 270); Displays vertauscht -> --swap
+# Kein Bild (EDID fehlt): in /boot/firmware/cmdline.txt video=HDMI-A-1:1080x1920@60 video=HDMI-A-2:1080x1920@60 anhängen
 # Autostart:
 sudo cp test/pi/rd160-ui.service /etc/systemd/system/ && sudo systemctl enable --now rd160-ui
 ```

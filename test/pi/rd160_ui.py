@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""RD160-Nachbau – Test-UI für 2× DFRobot DFR0524 (5,5" AMOLED) am Raspberry Pi 5.
+"""RD160-Nachbau – Test-UI für 2× Waveshare 5,5" HDMI AMOLED am Raspberry Pi 5.
 
 Zeigt die Bedienoberfläche im Stil des Originals (weiße Linien auf Schwarz) auf zwei Displays
 und Testbilder für den Plexiglas-Test. Eingaben kommen vom RP2040 (Drehknopf AS5600, Taster)

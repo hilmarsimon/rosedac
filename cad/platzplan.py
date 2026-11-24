@@ -31,7 +31,7 @@ PARTS = [
 ]
 COL = {"steuer": "#d9c8ef", "netz": "#f7d2b4", "dac": "#c4dbf2", "digital": "#cfe3f7"}
 FRONT_FIX = [  # schon konstruiert: Displays, Taster-/Knopfplatine (nur Darstellung)
-    ("2× DFR0524 + Treiber hinter dem Träger", -125, 125, 0, -20),
+    ("2× Waveshare 5,5\" + Winkelstecker", f.DISP_X - f.DISP_GW, f.DISP_X + f.DISP_GW, 0, -15),
     ("Taster-PCB", -205, -140, 0, -12),
     ("Knopf-PCB", 130, 203, -4, -22),
 ]

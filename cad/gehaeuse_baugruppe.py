@@ -69,6 +69,9 @@ for i in range(5):
         front.add(cap, name=f"Tasterkappe_{j * 5 + i + 1}", loc=cq.Location((f.BTN_X0 + i * f.BTN_PITCH_X, yy, z_cap)), color=ALU_H)
 front.add(f.make_power_cap(), name="Einschaltkappe", loc=cq.Location((f.PWR_X, f.PWR_Y, f.PCB_Z + f.SW_H - 0.1)), color=ALU_H)
 front.add(f.make_tab_screws(), name="Laschenschrauben_ISO10642_M3x8", color=STAHL)
+for cx, nm in zip(f.DISP_CX, ("links", "rechts")):
+    front.add(f.make_display(cx), name=f"Display_{nm}_Waveshare_5.5", color=C(0.02, 0.02, 0.03))
+front.add(f.make_display_screws(), name="Displayschrauben_ISO10642_M2.5x8", color=STAHL)
 
 geh = (cq.Assembly(name="Gehaeuse")
        .add(f.make_cover(), name="Deckel", color=ALU_H)
@@ -96,7 +99,9 @@ asm.save(f"{OUT}/RD160_Gehaeuse_Baugruppe.step")
 # ---------------- Prüfung: Hauptteile untereinander ----------------
 main = {"Blende": f.make_bezel(), "Traeger": f.make_carrier(), "Platte": f.make_panel().translate((0, 0, f.CARRIER_T)),
         "Deckel": f.make_cover(), "Boden": f.make_bottom(), "SR": f.make_side_panel(1), "SL": f.make_side_panel(-1),
-        "Rueckwand": f.make_rear_panel(), "QL_o": f.make_crossbar(True), "QL_u": f.make_crossbar(False)}
+        "Rueckwand": f.make_rear_panel(), "QL_o": f.make_crossbar(True), "QL_u": f.make_crossbar(False),
+        "Display_l": f.make_display(f.DISP_CX[0]), "Display_r": f.make_display(f.DISP_CX[1]),
+        "Knopfplatine": f.make_knob_pcb().translate((f.KNOB_X, 0, 0))}
 for i, (x, z) in enumerate(foot_points(), 1):
     main[f"Fuss_{i}"] = foot.translate((x, -f.H / 2, z))
 for k, b in f.make_rear_connectors().items():
@@ -118,6 +123,7 @@ rows = [("Blende", 1, "EN AW-6061, schwarz eloxiert", "RD160_Front_Blende.step")
         ("Schaumstoff Deckelauflage", 1, "PE/EPDM 2 mm", "-"),
         ("Drehknopf (Becher, Lichtleiter, Konus, Haltescheibe)", 1, "Alu / PMMA", "RD160_Knopf_*.step"),
         ("Knopfplatine", 1, "FR4 (Eigenbau)", "knopfplatine_schaltplan.py"),
+        ("Display Waveshare 5,5\" HDMI AMOLED", 2, "Kaufteil, 1080×1920", "doc/datenblaetter/"),
         ("Tasterkappe", 10, "Alu, eloxiert", "RD160_Tasterkappe.step"),
         ("Einschaltkappe", 1, "Alu, eloxiert", "RD160_Einschaltkappe.step"),
         ("Deckel", 1, "EN AW-6061, 5 mm", "RD160_Deckel.step"),
@@ -127,6 +133,7 @@ rows = [("Blende", 1, "EN AW-6061, schwarz eloxiert", "RD160_Front_Blende.step")
         ("Querleiste oben/unten", 2, "Alu-Flachstange 10×10", "RD160_Querleiste_*.step"),
         ("Fuß Ø46 × 9,5 (Annahme)", 4, "Alu, Befestigung offen", "-"),
         ("ISO 10642 M3×8 (Laschen)", 4, "Stahl schwarz", "-"),
+        ("ISO 10642 M2,5×8 + Silikonscheibe 0,5 (Displays)", len(f.DISP_SCREW_PTS), "Stahl schwarz", "-"),
         ("ISO 10642 M3×8 (Rückwand)", len(screws["Rueckwand_ISO10642_M3x8"]), "Stahl schwarz", "-"),
         ("ISO 4762 M3×10 (Deckel)", len(screws["Deckel_ISO4762_M3x10"]), "Stahl", "-"),
         ("ISO 7380 M3×6 (Boden)", len(screws["Boden_ISO7380_M3x6"]), "Stahl schwarz", "-"),

@@ -5,6 +5,7 @@ Plexiglasplatte;1;PLEXIGLAS LED B&W 9H04 SC / 7H25 GT, 3 mm;RD160_Front_Plexigla
 Schaumstoff Deckelauflage;1;PE/EPDM 2 mm;-
 Drehknopf (Becher, Lichtleiter, Konus, Haltescheibe);1;Alu / PMMA;RD160_Knopf_*.step
 Knopfplatine;1;FR4 (Eigenbau);knopfplatine_schaltplan.py
+"Display Waveshare 5,5"" HDMI AMOLED";2;Kaufteil, 1080×1920;doc/datenblaetter/
 Tasterkappe;10;Alu, eloxiert;RD160_Tasterkappe.step
 Einschaltkappe;1;Alu, eloxiert;RD160_Einschaltkappe.step
 Deckel;1;EN AW-6061, 5 mm;RD160_Deckel.step
@@ -14,6 +15,7 @@ Rückwand;1;EN AW-6061, 4 mm, schwarz eloxiert, Gravur;RD160_Rueckwand.step/.dxf
 Querleiste oben/unten;2;Alu-Flachstange 10×10;RD160_Querleiste_*.step
 Fuß Ø46 × 9,5 (Annahme);4;Alu, Befestigung offen;-
 ISO 10642 M3×8 (Laschen);4;Stahl schwarz;-
+ISO 10642 M2,5×8 + Silikonscheibe 0,5 (Displays);6;Stahl schwarz;-
 ISO 10642 M3×8 (Rückwand);10;Stahl schwarz;-
 ISO 4762 M3×10 (Deckel);5;Stahl;-
 ISO 7380 M3×6 (Boden);10;Stahl schwarz;-

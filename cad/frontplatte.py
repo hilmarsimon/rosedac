@@ -7,13 +7,13 @@ Aufbau: Ein Alu-Teil (Rahmen + Träger). Vorn eine Tasche, die die ganze Front b
 einen schmalen Rand ausfüllt; darin liegt eine 3-mm-PLEXIGLAS-LED-Black-&-White-Platte.
 Display, Taster und LED-Ring sitzen im Träger dahinter.
 
-Display: 2x DFRobot DFR0524 5,5" AMOLED 1080x1920 (HDMI), quer nebeneinander,
-         Outline je 124 x 71, aktiv je 121,42 x 68,3.
+Display: 2x Waveshare 5,5" HDMI AMOLED 1080x1920, quer nebeneinander, HDMI-Buchse unten.
+         Deckglas je 140,4 x 74,76 R4, Sichtfläche 121,76 x 68,7 (doc/datenblaetter).
 """
 import cadquery as cq
 
 # ---------------- Rahmen / Träger ----------------
-W, H, T = 430.0, 78.0, 13.5           # Außenmaß (Korpus ohne Füße; Fotos: ca. 74 + Füße, 78 wegen DFR0524), Frontdicke
+W, H, T = 430.0, 82.0, 13.5           # Außenmaß (Korpus ohne Füße; Fotos: ca. 74 + Füße, 82 wegen Deckglas 74,76), Frontdicke
                                       # (Lippe 1,5 + Platte 3 + Träger 9)
 FRAME_B = 4.0                         # sichtbarer Alu-Rand
 FRAME_R = 2.0                         # Innenradius Fronttasche
@@ -26,7 +26,7 @@ EDGE_CHAMFER = 0.5
 # liegt oben in der Nut an -> Deckel vorn gehalten, ohne Schrauben. Deckeloberseite bündig. UNTEN: Auflage BOT_T tief (Bodenblech).
 # Seitenteile L-förmig (Falz oben innen), Deckel mit L-förmigen Rändern als Gegenstück -> Deckel seitlich geführt,
 # liegt auf den Seitenteilen; vorn auf Schaumstoff und Laschen.
-FL_H = 9.0                            # Flanschhöhe (nach innen)
+FL_H = 11.0                           # Flanschhöhe (nach innen): Innenkante y ±30 wie bei H = 78 (Knopf-/Tasterplatine)
 BAND = 10.0                           # vorderes Band, volle Höhe
 END_W = 11.0                          # Seitenwand der Front (in X)
 COVER_T = 5.0                         # Deckeldicke (Rückseitenfoto: ca. 5 mm)
@@ -85,17 +85,29 @@ PANEL_R = FRAME_R + PANEL_OVL
 RAB_X, RAB_Y = PANEL_W / 2 + PANEL_GAP, PANEL_H / 2 + PANEL_GAP   # Falz/Durchgang in der Blende (halbe Maße)
 RAB_R = PANEL_R + PANEL_GAP
 BZ_CLR = 0.1                          # Spiel Träger <-> Blende
-BZ_SCREW_X = (-208.0, -172.0, -135.0, 135.0, 172.0, 208.0)       # M2,5 Senk von unten (Unterseite), außerhalb der Displaytasche
+BZ_SCREW_X = (-208.0, -172.0, -146.0, 146.0, 172.0, 208.0)       # M2,5 Senk von unten (Unterseite), außerhalb der Displaytasche
 BZ_SCREW_Z = (T - BAND + CARRIER_T - SEAT_GAP) / 2                 # Mitte Band-Rückseite .. Trägerfront
 
 # ---------------- Display ----------------
-DISP_W, DISP_H = 2 * 124.0, 71.0      # 2x DFR0524 Outline, Stoß bei X=0
-DISP_CLR = 0.5
-DISP_X = 0.0
+# 2x Waveshare 5,5" HDMI AMOLED, Maße aus Zeichnung + STEP (doc/datenblaetter). Modul-Koordinaten: Ursprung Glasmitte,
+# x' = -x(STEP), y' = z(STEP) -> HDMI-/USB-Buchse unten, Glasfront an der Plattenrückseite (Z = CARRIER_T).
+DISP_GW, DISP_GH, DISP_GR = 140.4, 74.76, 4.0     # Deckglas
+DISP_VA = (121.76, 68.7)                          # Sichtfläche, mittig
+DISP_W, DISP_H = 2 * DISP_GW, DISP_GH             # Stoß bei X = DISP_X
+DISP_CLR = 0.3
+DISP_X = 0.5                          # mittig zwischen Taster-Senkung (x -141,5) und Lichttasche (x 142,5): je 1,3 Wand
+DISP_CX = (DISP_X - DISP_GW / 2, DISP_X + DISP_GW / 2)
+DISP_STEP_FRONT = 0.7                 # STEP: Glasfront y = 0,7; Lage im Gerät z = CARRIER_T + (y - 0,7)
+DISP_SO = [(61.75, 31.13), (61.75, -16.6), (39.75, 25.6), (39.75, -23.4), (-18.25, -23.4), (-18.25, 25.6),
+           (-60.22, 31.13), (-48.25, -31.37)]      # 8 Abstandsbolzen M2,5 SW5,5, Ende y = -8,0
+DISP_SO_FIX = [(61.75, 31.13), (-60.22, 31.13), (-48.25, -31.37)]   # verschraubt durch die Flansche (3-Punkt)
+DISP_HDMI = (4.29, 19.29, -28.89, -16.74, -10.33)  # x0, x1, y0, y1, Rückseite (STEP-y) – Öffnung zeigt nach unten
+DISP_USB = (-14.41, -6.11, -28.97, -14.97, -8.8)   # USB (Touch/Versorgung), Öffnung nach unten
+DISP_NOTCH_X = (-17.0, 22.0)          # Freischnitt im unteren Flansch für Winkelstecker HDMI + USB
 PNL_W = DISP_W + 2 * DISP_CLR
 PNL_H = DISP_H + 2 * DISP_CLR
 PNL_DEPTH = CARRIER_T                 # von hinten bis an die Plexiglasplatte
-GROOVE_X0 = PNL_W / 2 + 4.0           # Deckelnut/Feder nur außerhalb der Displaytasche (H = 78: Tasche reicht bis y 36)
+GROOVE_X0 = PNL_W / 2 + DISP_X + 4.0  # Deckelnut/Feder nur außerhalb der Displaytasche (Tasche reicht bis y 37,7)
 
 # ---------------- Taster (2 x 5) ----------------
 BTN_X0, BTN_PITCH_X = -198.0, 13.0
@@ -125,12 +137,14 @@ PWR_CB_D, PWR_CB_DEPTH = 16.0, 5.0
 
 # ---------------- Gewinde M3 (Sackloch von hinten) ----------------
 M3_TAP_D, M3_DRILL_DEPTH, M3_THREAD_DEPTH = 2.5, 7.0, 6.0
-M3_HOLES = {
-    "Chassis":       [(-128, 0), (128, 0)],
+M3_HOLES = {                          # von vorn gesehen, Sackloch von der Trägerrückseite (Z = 0)
     "Taster-PCB":    [(x, sy * 26) for x in (-191, -153) for sy in (-1, 1)],   # y26: Abstandsbolzen Ø5 frei vom Flansch (y30)
-    "LED/Encoder-PCB": [(KNOB_X - 30, 24), (KNOB_X - 30, -24), (KNOB_X + 22, -25), (KNOB_X + 8, 25)],
-    "Panel-Klemmrahmen": [(sx * 127, sy * 25) for sx in (-1, 1) for sy in (-1, 1)],
+    "LED/Encoder-PCB": [(KNOB_X - 22, 24), (KNOB_X - 22, -24), (KNOB_X + 22, -25), (KNOB_X + 8, 25)],
 }
+# Bohrungen von der Flanschrückseite (Z = FL_Z0) nach vorn
+CHASSIS_PTS = [(-30.0, -35.0), (30.0, -35.0)]                        # M3 T4 im unteren Flansch (Masse/Chassis)
+DISP_SCREW_PTS = [(cx + x, y) for cx in DISP_CX for x, y in DISP_SO_FIX]  # Ø2,7 durch + Senkung, ISO 10642 M2,5x8
+DISP_BOSS_W = 7.0                                                    # Verstärkung am Flansch (Bohrung bei |y| 31,1..31,4)
 
 
 def rrect(w, h, r):
@@ -172,6 +186,22 @@ def _front_body(front_pocket=False):
         p = p.cut(cq.Workplane("XY").box(2 * ix, seat + 0.01, zb - FL_Z0 + 0.01, centered=(True, True, False))
                   .translate((0, sy * (H / 2 - seat / 2 + 0.005), FL_Z0 - 0.01)))
     p = p.cut(_groove_tool())
+
+    # Displaybefestigung: Verstärkungen an der Flanschinnenkante, Durchgang M2,5 mit Senkung von hinten (in die Bolzen)
+    yi = H / 2 - FL_H
+    for x, y in DISP_SCREW_PTS:
+        sy = 1 if y > 0 else -1
+        p = p.union(cq.Workplane("XY").box(DISP_BOSS_W, 0.8, -FL_Z0, centered=(True, False, False))
+                    .translate((x, sy * yi - (0.8 if sy > 0 else 0), FL_Z0)))
+        p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(1.35, -FL_Z0 + 0.2, cq.Vector(x, y, FL_Z0 - 0.1))))
+        p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCone(2.6, 1.35, 1.25, cq.Vector(x, y, FL_Z0 - 0.01))))
+    for x, y in CHASSIS_PTS:
+        p = p.cut(cq.Workplane("XY").add(cq.Solid.makeCylinder(M3_TAP_D / 2, 5.0, cq.Vector(x, y, FL_Z0 - 0.01))))
+    # Freischnitt unterer Flansch für die Winkelstecker (HDMI, USB) – Außenhaut unten bleibt
+    for cx in DISP_CX:
+        x0, x1 = DISP_NOTCH_X
+        p = p.cut(cq.Workplane("XY").box(x1 - x0, PNL_H / 2 - yi, -FL_Z0 + 0.02, centered=(False, False, False))
+                  .translate((cx + x0, -PNL_H / 2, FL_Z0 - 0.01)))
 
     # Innenecken der Auflage (Band-Rückseite / Seitenwand) senkrecht ausgerundet SEAT_R (Fräserradius, wie Original)
     for sy, seat in ((1, SEAT_D),):          # nur oben: Bodenblech ist ein Rechteck und stößt hinten an die Front
@@ -330,6 +360,31 @@ def make_panel():
     p = p.cut(cq.Workplane("XY").center(KNOB_X, 0).circle(SHAFT_PANEL_D / 2).extrude(PANEL_T))
     p = p.cut(cq.Workplane("XY").center(PWR_X, PWR_Y).circle(PWR_PANEL_D / 2).extrude(PANEL_T))
     return p
+
+
+def make_display(cx=None):
+    """Ein Waveshare-5,5"-Modul als vereinfachter Körper (Glas+Modul, Platine, Bolzen, HDMI, USB) in Gerätekoordinaten.
+    cx: Glasmitte X (Standard: rechtes Modul)."""
+    cx = DISP_CX[1] if cx is None else cx
+    zf = CARRIER_T                                  # Glasfront an der Plattenrückseite
+    zs = lambda ys: zf + (ys - DISP_STEP_FRONT)     # STEP-y -> Gerät-Z
+    d = (cq.Workplane("XY").workplane(offset=zs(-4.85)).placeSketch(rrect(DISP_GW, DISP_GH, DISP_GR))
+         .extrude(zf - zs(-4.85)))
+    d = d.union(cq.Workplane("XY").box(130.0, 70.5, 1.6, centered=False).translate((-64.23, -35.38, zs(-4.0))))
+    for x, y in DISP_SO:
+        d = d.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(2.75, zs(-4.0) - zs(-8.0), cq.Vector(x, y, zs(-8.0)))))
+    for x0, x1, y0, y1, yb in (DISP_HDMI, DISP_USB):
+        d = d.union(cq.Workplane("XY").box(x1 - x0, y1 - y0, zs(-4.0) - zs(yb), centered=False).translate((x0, y0, zs(yb))))
+    return d.translate((cx, 0, 0))
+
+
+def make_display_screws():
+    """ISO 10642 M2,5x8 von hinten durch die Flansche in die Bolzen (Senkkopf bündig)."""
+    sol = []
+    for x, y in DISP_SCREW_PTS:
+        sol.append(cq.Solid.makeCone(2.5, 1.25, 1.25, cq.Vector(x, y, FL_Z0)))
+        sol.append(cq.Solid.makeCylinder(1.25, 8.0 - 1.25, cq.Vector(x, y, FL_Z0 + 1.25)))
+    return cq.Workplane("XY").add(cq.Compound.makeCompound(sol))
 
 
 def make_button_cap():
@@ -818,7 +873,7 @@ def make_power_cap():
 
 # ---------------- Knopfplatine (Encoder + LED-Ring + Einschalttaster) ----------------
 PCB_T = 1.6
-PCB_OUTLINE = [(-34, -29.0), (34, -29.0), (34, 29.0), (-34, 29.0)]   # relativ zur Knopfachse; H = 78: zwischen den Flanschen (y ±30)
+PCB_OUTLINE = [(-34, -29.0), (34, -29.0), (34, 29.0), (-34, 29.0)]   # relativ zur Knopfachse; zwischen den Flanschen (Innenkante y ±30)
 LED_L, LED_W, LED_H = 3.5, 2.8, 1.9               # PLCC-2 3528, weiß, Top-View
 SOIC_L, SOIC_W, SOIC_H = 4.9, 3.9, 1.5            # AS5600
 
@@ -850,7 +905,7 @@ def make_pcb_parts():
     sw = sw.union(cq.Workplane("XY").workplane(offset=z + 3.5).center(sx, sy).circle(1.75).extrude(SW_H - 3.5))
     parts["Taster_B3F-1000"] = sw
     parts["Stecker_JST-PH_7p_hinten"] = (cq.Workplane("XY").workplane(offset=z - PCB_T - 6.0)
-                                         .center(-12, -25.5).rect(15.9, 4.5).extrude(6.0))   # innerhalb Platinenkontur (H = 78)
+                                         .center(-8, -25.5).rect(15.9, 4.5).extrude(6.0))   # innerhalb Platinenkontur, frei von den Bolzen
     holes = [(x - KNOB_X, y) for x, y in M3_HOLES["LED/Encoder-PCB"]]
     so = None
     for hx, hy in holes:
@@ -903,6 +958,9 @@ if __name__ == "__main__":
         asm.add(make_side_stub(sx), name=f"Seitenteil_{nm}_Ausschnitt", color=cq.Color(0.1, 0.1, 0.11))
     asm.add(make_tab_screws(), name="Laschenschrauben_M3x8_ISO10642", color=cq.Color(0.3, 0.3, 0.3))
     asm.add(make_cover_edge(), name="Deckel_Ausschnitt", color=cq.Color(0.75, 0.76, 0.78))
+    for cx, nm in zip(DISP_CX, ("links", "rechts")):
+        asm.add(make_display(cx), name=f"Display_{nm}", color=cq.Color(0.02, 0.02, 0.03))
+    asm.add(make_display_screws(), name="Displayschrauben_M2,5x8_ISO10642", color=cq.Color(0.3, 0.3, 0.3))
     asm.save(f"{out}/RD160_Front_Baugruppe.step")
     # Kollisionsprüfung Rahmen / Seitenteile / Deckel / Schaumstoff / Schrauben
     chk = {"Blende": make_bezel(), "Traeger": make_carrier(), "Platte": panel.translate((0, 0, CARRIER_T)),
@@ -910,6 +968,8 @@ if __name__ == "__main__":
            "Deckel": make_cover(), "Boden": make_bottom(), "Rueckwand": make_rear_panel(),
            "Schaum": make_foam(), "Schrauben": make_tab_screws()}
     chk["Knopfplatine"] = make_knob_pcb().translate((KNOB_X, 0, 0))
+    chk["Display_l"] = make_display(DISP_CX[0])
+    chk["Display_r"] = make_display(DISP_CX[1])
     chk["Querleiste_o"] = make_crossbar(True)
     chk["Querleiste_u"] = make_crossbar(False)
     _bu = list(make_rear_connectors().values())

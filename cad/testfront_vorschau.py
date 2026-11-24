@@ -1,12 +1,9 @@
-"""Vorschau Testfront: Rückansicht (Klammern, Sensorhalter) und Schrägansicht vorn."""
+"""Vorschau Testfront: Rückansicht (Displays, Sensorhalter) und Schrägansicht vorn."""
 import os, subprocess, cadquery as cq
 import frontplatte as f, testfront as t
 OUT = t.OUT
-cl = t.display_clamp()
-clamps = [cl.translate((127, 25, 0)), cl.translate((127, -25, 0)),
-          cl.rotate((0, 0, 0), (0, 0, 1), 180).translate((-127, 25, 0)), cl.rotate((0, 0, 0), (0, 0, 1), 180).translate((-127, -25, 0))]
 parts = [t.half(-1).translate((-1.5, 0, 0)), t.half(1).translate((1.5, 0, 0)), t.sensor_holder().translate((1.5, 0, 0))]
-parts += [c.translate((1.5 if i < 2 else -1.5, 0, 0)) for i, c in enumerate(clamps)]
+parts += [f.make_display(f.DISP_CX[0]).translate((-1.5, 0, 0)), f.make_display(f.DISP_CX[1]).translate((1.5, 0, 0))]
 front = parts + [t.panel_half(-1).translate((-1.5, 0, f.CARRIER_T)), t.panel_half(1).translate((1.5, 0, f.CARRIER_T)),
                  f.make_knob().translate((f.KNOB_X + 1.5, 0, 0))]
 def render(ps, name, pd, rot):
