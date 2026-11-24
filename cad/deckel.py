@@ -64,12 +64,13 @@ _fa, _fb = f.GROOVE_X0 + run + 1.0, W / 2 - f.END_W - run - 1.0      # Feder: zw
 _tl = f.TONGUE_L + f.JOINT - 0.3
 for _s in (1, -1):
     ax.add_patch(Rectangle((min(_s * _fa, _s * _fb), -_tl), _fb - _fa, _tl, fc="#c9ccd1", ec="k", lw=0.8))
-_xi, _xa, _zr, _zv = f.deco_rect()
+_xo, _zf, _xi, _zi = f.deco_rect()
+ax.add_patch(Rectangle((-_xo, V(_zf)), 2 * _xo, V(_zi) - V(_zf), fc="#b03030", ec="#b03030", lw=0.6))      # Stirnlinie
 for _s in (1, -1):
-    ax.add_patch(Rectangle((_s * (_xi + _xa) / 2 - f.DECO_W / 2, V(_zv)), f.DECO_W, V(_zr) - V(_zv), fc="#b03030", ec="#b03030", lw=0.6))
-ax.annotate(f"Ziernut {f.DECO_W} breit, {f.DECO_D} tief, in Flucht der Fuge zur Front-Seitenwand\n"
-            f"({f.W / 2 - _xa:.0f}..{f.W / 2 - _xi:.1f} von der Kante), gerade, läuft hinten offen aus. Vorn bildet die Fuge {f.JOINT} die Linie.",
-            (_xi, V(_zv) + 40), (-200, V(f.Z_REAR) - 60), fontsize=8.5, color="#b03030",
+    ax.add_patch(Rectangle((_xi if _s > 0 else -_xo, V(_zf)), f.DECO_W, V(f.Z_REAR) - V(_zf), fc="#b03030", ec="#b03030", lw=0.6))
+ax.annotate(f"Ziernut {f.DECO_W} breit, {f.DECO_D} tief: vorn entlang dem Stoß zur Front, Ecken rechtwinklig (nicht um die Radien),\n"
+            f"seitlich {f.W / 2 - _xo:.1f}..{f.W / 2 - _xi:.1f} von der Kante gerade bis hinten (offen)",
+            (_xi, V(_zf) + 40), (-200, V(f.Z_REAR) - 60), fontsize=8.5, color="#b03030",
             arrowprops=dict(arrowstyle="-", lw=0.4, color="#b03030"))
 for x, z in f.cover_screw_points():
     ax.add_patch(Circle((x, V(z)), 1.25, fc="none", ec="k", lw=0.7, ls="--"))
@@ -155,7 +156,7 @@ notes = [
     "2. Ebene Platte, keine Absätze an den Längsseiten; Kanten oben Fase 0,3.",
     f"3. Vorn: Eckausklinkungen {(wl - wf) / 2:.1f} × {V(z1 - 0.3):.1f}; Feder 2× {_fb - _fa:.1f} breit (ab ±{_fa:.1f}), oben {f.GROOVE_TOP:.0f} abgesetzt, {_tl:.1f} lang.",
     f"4. Hinten 2× M3-Sackgewinde von unten, Kernloch Ø2,5 × 4, Gewinde {f.COVER_THREAD:.0f} tief (2 mm Restwand) – keine Bohrungen oben.",
-    f"5. Ziernut oben {f.DECO_W} × {f.DECO_D} tief, zwei gerade Linien {f.W / 2 - f.deco_rect()[1]:.0f}..{f.W / 2 - f.deco_rect()[0]:.1f} von der Kante ab Ende Frontzone bis hinten offen (Gravierfräser Ø0,6), vor dem Eloxieren. Frontzone {2 * (f.W / 2 - f.END_W - f.JOINT):.1f} breit, Ecken R{f.SEAT_R - f.JOINT:.1f}: Fuge {f.JOINT} zur Front rundum.",
+    f"5. Ziernut oben {f.DECO_W} × {f.DECO_D} tief: vorn entlang der Stirn, Ecken rechtwinklig, seitlich {f.W / 2 - f.deco_rect()[0]:.1f}..{f.W / 2 - f.deco_rect()[2]:.1f} von der Kante gerade bis hinten offen (Gravierfräser Ø0,6), vor dem Eloxieren. Frontzone {2 * (f.W / 2 - f.END_W - f.JOINT):.1f} breit, Ecken R{f.SEAT_R - f.JOINT:.1f}, Fuge {f.JOINT} zur Front.",
     "6. Oberfläche wie Rahmen (Glasperlen + Eloxal schwarz) oder gebürstet + Eloxal natur.",
     "MONTAGE: Deckel von hinten flach einschieben (liegt auf den Seitenteilen), Feder in die Nut; liegt auf Wulst, Laschen",
     f"und Schaumstoff ({f.FOAM_T:.0f} → {f.FOAM_C}). Hinten 2× ISO 4762 M3×10 von unten durch die Wulst (Zugang bei abgenommenem Bodenblech).",

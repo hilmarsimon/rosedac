@@ -40,9 +40,10 @@ GROOVE_H = TONGUE_T + 0.3             # Nuthöhe (0,3 Luft unten, Schaum drückt
 GROOVE_D = 4.0                        # Nuttiefe ins Band (Restband vorn 6 mm)
 TONGUE_L = GROOVE_D - 0.3             # Federlänge (Deckelstirn 0,3 vor dem Band)
 CUTTER_R = 10.0                       # Scheibenfräser Ø20: Auslauf an den Nutenden
-SEAT_R = 3.0                          # senkrechte Innenecken Auflage/Seitenwand (Fräser Ø6), Foto
+SEAT_R = 2.3                          # senkrechte Innenecken Auflage/Seitenwand (Fräser Ø4); ≤ 2,35 damit die Ziernut-
+                                      # Innenecke rechtwinklig im Deckel liegt (Deckelecke R = SEAT_R - JOINT ≤ 2,05)
 DECO_W, DECO_D = 0.6, 0.15            # Ziernut im Deckel: Breite, Tiefe (Foto); Lage siehe deco_rect()
-JOINT = DECO_W                        # Fuge Deckel/Boden ↔ Front ringsum = Ziernutbreite: eine durchgehende Linie
+JOINT = 0.3                           # Fuge Deckel ↔ Front ringsum, Deckelecke konzentrisch zur Innenecke R SEAT_R
 BOT_T = 1.0                           # Bodenblech 1 mm
 BOT_LIP = 0.0                         # Bodenblech liegt im Absatz, Unterseite bündig mit der Geräteunterkante
 BOT_CLR = 0.0
@@ -517,20 +518,22 @@ def cover_outline():
 
 
 def deco_rect():
-    """Ziernut = Verlängerung der Fuge Deckel/Seitenwand der Front nach hinten: zwei gerade Linien in Flucht der
-    Seitenwand-Innenkante (|x| = W/2 - END_W - JOINT .. W/2 - END_W), vom Ende der Frontzone bis hinten offen.
-    Vorn und an den Ecken bildet die Fuge (JOINT = DECO_W) selbst die Linie. Rückgabe: x innen, x außen, z hinten, z vorn."""
-    return (W / 2 - END_W - JOINT, W / 2 - END_W, Z_REAR, FL_Z0 - 0.3)
+    """Ziernut rechtwinklig (nimmt die Eckradien nicht mit): Außenkante = Deckelkontur der Frontzone.
+    Rückgabe: x außen (Seitenlinien), z vorn (Stirnlinie), x/z der Innenecke."""
+    xo, zf = W / 2 - END_W - JOINT, T - BAND - JOINT
+    return xo, zf, xo - DECO_W, zf - DECO_W
 
 
 def make_deco_groove():
-    """Ziernut DECO_W breit, DECO_D tief: nur die beiden Seitenlinien, hinten offen auslaufend."""
-    xi, xa, zr, zv = deco_rect()
-    g = None
-    for sx in (1, -1):
-        b = (cq.Workplane("XY").box(xa - xi, DECO_D + 0.01, zv - zr + 2.0, centered=(False, False, False))
-             .translate((xi if sx > 0 else -xa, H / 2 - DECO_D, zr - 1.0)))
-        g = b if g is None else g.union(b)
+    """Ziernut DECO_W breit, DECO_D tief: vorn entlang dem Stoß Deckel/Front (Stirnkante), seitlich gerade bis hinten
+    offen, Ecken rechtwinklig (Innenecke liegt im Deckel, da Deckelecke R ≤ 2,05). Fräsen mit Gravierfräser Ø0,6."""
+    xo, zf, xi, zi = deco_rect()
+    y0 = H / 2 - DECO_D
+    g = (cq.Workplane("XY").box(2 * xo + 2, DECO_D + 0.02, zf + 1 - zi, centered=(True, False, False))
+         .translate((0, y0, zi)))                               # Stirnlinie
+    for sx in (1, -1):                                          # Seitenlinien bis hinten offen
+        g = g.union(cq.Workplane("XY").box(DECO_W, DECO_D + 0.02, zf + 1 - (Z_REAR - 1), centered=(False, False, False))
+                    .translate((xi if sx > 0 else -xo, y0, Z_REAR - 1)))
     return g
 
 
