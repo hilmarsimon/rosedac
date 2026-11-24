@@ -40,8 +40,9 @@ GROOVE_H = TONGUE_T + 0.3             # Nuthöhe (0,3 Luft unten, Schaum drückt
 GROOVE_D = 4.0                        # Nuttiefe ins Band (Restband vorn 6 mm)
 TONGUE_L = GROOVE_D - 0.3             # Federlänge (Deckelstirn 0,3 vor dem Band)
 CUTTER_R = 10.0                       # Scheibenfräser Ø20: Auslauf an den Nutenden
-SEAT_R = 2.3                          # senkrechte Innenecken Auflage/Seitenwand (Fräser Ø4); ≤ 2,35 damit die Ziernut-
-                                      # Innenecke rechtwinklig im Deckel liegt (Deckelecke R = SEAT_R - JOINT ≤ 2,05)
+SEAT_R = 0.9                          # senkrechte Innenecken Band/Seitenwand = JOINT + DECO_W (Fräser Ø1,6, 5 tief):
+                                      # Linie Fuge + Ziernut ums Eck konstant breit (Außenbogen R0,9 um die rechtwinklige
+                                      # Innenecke der Ziernut), Deckelecke R = SEAT_R - JOINT = 0,6 liegt im Nutgrund
 DECO_W, DECO_D = 0.6, 0.15            # Ziernut im Deckel: Breite, Tiefe (Foto); Lage siehe deco_rect()
 JOINT = 0.3                           # Fuge Deckel ↔ Front ringsum, Deckelecke konzentrisch zur Innenecke R SEAT_R
 BOT_T = 1.0                           # Bodenblech 1 mm
@@ -525,15 +526,16 @@ def deco_rect():
 
 
 def make_deco_groove():
-    """Ziernut DECO_W breit, DECO_D tief: vorn entlang dem Stoß Deckel/Front (Stirnkante), seitlich gerade bis hinten
-    offen, Ecken rechtwinklig (Innenecke liegt im Deckel, da Deckelecke R ≤ 2,05). Fräsen mit Gravierfräser Ø0,6."""
+    """Ziernut DECO_D tief: vorn DECO_W an der Stirnkante (+ Fuge JOINT = sichtbare Linie DECO_W + JOINT), Ecken
+    rechtwinklig, seitlich gerade bis hinten offen, dort DECO_W + JOINT breit -> Linie überall gleich breit."""
     xo, zf, xi, zi = deco_rect()
     y0 = H / 2 - DECO_D
     g = (cq.Workplane("XY").box(2 * xo + 2, DECO_D + 0.02, zf + 1 - zi, centered=(True, False, False))
          .translate((0, y0, zi)))                               # Stirnlinie
     for sx in (1, -1):                                          # Seitenlinien bis hinten offen
-        g = g.union(cq.Workplane("XY").box(DECO_W, DECO_D + 0.02, zf + 1 - (Z_REAR - 1), centered=(False, False, False))
-                    .translate((xi if sx > 0 else -xo, y0, Z_REAR - 1)))
+        w = DECO_W + JOINT                                      # hinter der Frontzone so breit wie Nut + Fuge davor
+        g = g.union(cq.Workplane("XY").box(w, DECO_D + 0.02, zf + 1 - (Z_REAR - 1), centered=(False, False, False))
+                    .translate((xi if sx > 0 else -xi - w, y0, Z_REAR - 1)))
     return g
 
 
