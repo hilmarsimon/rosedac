@@ -10,6 +10,7 @@ Display, Taster und LED-Ring sitzen im Träger dahinter.
 Display: 2x Waveshare 5,5" HDMI AMOLED 1080x1920, quer nebeneinander, HDMI-Buchse unten.
          Deckglas je 140,4 x 74,76 R4, Sichtfläche 121,76 x 68,7 (doc/datenblaetter).
 """
+import os
 import cadquery as cq
 
 # ---------------- Rahmen / Träger ----------------
@@ -101,9 +102,13 @@ DISP_STEP_FRONT = 0.7                 # STEP: Glasfront y = 0,7; Lage im Gerät 
 DISP_SO = [(61.75, 31.13), (61.75, -16.6), (39.75, 25.6), (39.75, -23.4), (-18.25, -23.4), (-18.25, 25.6),
            (-60.22, 31.13), (-48.25, -31.37)]      # 8 Abstandsbolzen M2,5 SW5,5, Ende y = -8,0
 DISP_SO_FIX = [(61.75, 31.13), (-60.22, 31.13), (-48.25, -31.37)]   # verschraubt durch die Flansche (3-Punkt)
-DISP_HDMI = (4.29, 19.29, -28.89, -16.74, -10.33)  # x0, x1, y0, y1, Rückseite (STEP-y) – Öffnung zeigt nach unten
-DISP_USB = (-14.41, -6.11, -28.97, -14.97, -8.8)   # USB (Touch/Versorgung), Öffnung nach unten
-DISP_NOTCH_X = (-17.0, 22.0)          # Freischnitt im unteren Flansch für Winkelstecker HDMI + USB
+# Buchsen aus dem Hersteller-STEP (doc/datenblaetter/Waveshare_5.5inch_HDMI_AMOLED.stp): x0, x1, y0, y1, Rückseite (STEP-y)
+DISP_HDMI = (4.29, 19.29, -28.9, -16.74, -10.33)   # Molex 47151 HDMI A, Öffnung nach unten
+DISP_USB = (27.97, 36.03, -27.07, -21.48, -6.68)   # Micro-USB (Versorgung/Touch), Öffnung nach unten
+DISP_JACK = (-14.42, -6.11, -28.97, -14.97, -8.8)  # Klinke 3,5 (SJ2-35894D), Öffnung nach unten, bleibt frei
+DISP_USB2 = (-46.36, -40.78, 15.57, 23.62, -6.68)  # 2. Micro-USB, Öffnung seitlich – nicht nutzbar
+DISP_FPC = (-63.73, -53.73, -19.01, -14.51, -6.0)  # Touch-FPC-Stecker
+DISP_NOTCH_X = (-1.0, 40.0)           # Freischnitt im unteren Flansch für Winkelstecker HDMI + Micro-USB
 PNL_W = DISP_W + 2 * DISP_CLR
 PNL_H = DISP_H + 2 * DISP_CLR
 PNL_DEPTH = CARRIER_T                 # von hinten bis an die Plexiglasplatte
@@ -142,8 +147,9 @@ M3_HOLES = {                          # von vorn gesehen, Sackloch von der Träg
     "LED/Encoder-PCB": [(KNOB_X - 22, 24), (KNOB_X - 22, -24), (KNOB_X + 22, -25), (KNOB_X + 8, 25)],
 }
 # Bohrungen von der Flanschrückseite (Z = FL_Z0) nach vorn
-CHASSIS_PTS = [(-30.0, -35.0), (30.0, -35.0)]                        # M3 T4 im unteren Flansch (Masse/Chassis)
+CHASSIS_PTS = [(-20.0, -35.0), (45.0, -35.0)]                        # M3 T4 im unteren Flansch (Masse/Chassis)
 DISP_SCREW_PTS = [(cx + x, y) for cx in DISP_CX for x, y in DISP_SO_FIX]  # Ø2,7 durch + Senkung, ISO 10642 M2,5x8
+DISP_SCREW_L = 8.0                                                   # ISO 10642 M2,5x8: 2,2 Gewinde im SMT-Bolzen (4 hoch, länger träfe die Platine)
 DISP_BOSS_W = 7.0                                                    # Verstärkung am Flansch (Bohrung bei |y| 31,1..31,4)
 
 
@@ -373,9 +379,23 @@ def make_display(cx=None):
     d = d.union(cq.Workplane("XY").box(130.0, 70.5, 1.6, centered=False).translate((-64.23, -35.38, zs(-4.0))))
     for x, y in DISP_SO:
         d = d.union(cq.Workplane("XY").add(cq.Solid.makeCylinder(2.75, zs(-4.0) - zs(-8.0), cq.Vector(x, y, zs(-8.0)))))
-    for x0, x1, y0, y1, yb in (DISP_HDMI, DISP_USB):
+    for x0, x1, y0, y1, yb in (DISP_HDMI, DISP_USB, DISP_JACK, DISP_USB2, DISP_FPC):
         d = d.union(cq.Workplane("XY").box(x1 - x0, y1 - y0, zs(-4.0) - zs(yb), centered=False).translate((x0, y0, zs(yb))))
     return d.translate((cx, 0, 0))
+
+
+DISP_STEP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "doc", "datenblaetter",
+                         "Waveshare_5.5inch_HDMI_AMOLED.stp")
+_disp_step_cache = []
+
+
+def display_step(cx):
+    """Hersteller-STEP in Gerätekoordinaten: (x, y, z)_STEP -> (cx - x, z, CARRIER_T + y - DISP_STEP_FRONT)."""
+    if not _disp_step_cache:
+        _disp_step_cache.append(cq.importers.importStep(DISP_STEP).val())
+    o = cq.Vector(0, 0, 0)
+    sh = _disp_step_cache[0].rotate(o, cq.Vector(1, 0, 0), 90).rotate(o, cq.Vector(0, 0, 1), 180)   # (x,y,z) -> (-x,z,y)
+    return cq.Workplane("XY").add(sh.translate(cq.Vector(cx, 0, CARRIER_T - DISP_STEP_FRONT)))
 
 
 def make_display_screws():
@@ -383,7 +403,7 @@ def make_display_screws():
     sol = []
     for x, y in DISP_SCREW_PTS:
         sol.append(cq.Solid.makeCone(2.5, 1.25, 1.25, cq.Vector(x, y, FL_Z0)))
-        sol.append(cq.Solid.makeCylinder(1.25, 8.0 - 1.25, cq.Vector(x, y, FL_Z0 + 1.25)))
+        sol.append(cq.Solid.makeCylinder(1.25, DISP_SCREW_L - 1.25, cq.Vector(x, y, FL_Z0 + 1.25)))
     return cq.Workplane("XY").add(cq.Compound.makeCompound(sol))
 
 
@@ -620,7 +640,7 @@ def bot_front_points():
     return [(sx * (W / 2 - COVER_SCREW_U), BOT_FRONT_Z) for sx in (1, -1)]
 
 
-BOT_FL_X = (-100.0, 0.0, 100.0)        # Bodenschrauben vorn in den unteren Frontflansch
+BOT_FL_X = (-125.0, 0.0, 125.0)        # Bodenschrauben vorn in den unteren Frontflansch
 
 
 def bot_flange_points():
@@ -981,6 +1001,14 @@ if __name__ == "__main__":
             if v > 1e-3:
                 print("KOLLISION", ks[i], ks[j], round(v, 3))
     print("Kollisionsprüfung fertig")
+    # Gegenprüfung mit dem Hersteller-STEP (alle Bauteile der Displayplatine)
+    for cx, nm in zip(DISP_CX, ("l", "r")):
+        ds = display_step(cx)
+        for k in ("Blende", "Traeger", "Platte", "Boden", "Knopfplatine"):
+            v = ds.intersect(chk[k], clean=False).val().Volume()
+            if v > 1e-3:
+                print("KOLLISION STEP-Display", nm, k, round(v, 3))
+    print("STEP-Display geprüft")
     bb = frame.val().BoundingBox()
     print("Rahmen BB:", round(bb.xlen, 2), round(bb.ylen, 2), round(bb.zlen, 2),
           "| Platte:", round(PANEL_W, 1), "x", round(PANEL_H, 1), "x", PANEL_T)
