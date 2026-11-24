@@ -33,6 +33,7 @@
 | DAC | **Entschieden 11/2026:** AckoDAC AKD49S (AK4191 + AK4499EX, I-V onboard, ±15 V) + Ian Canada ReceiverPi DDC II + FifoPi Q7 III (Reclocking, MCLK) + PurePi II; Eigenbau: Steuer-, Taster-, Knopfplatine, kleine Eingangsplatine (Relais-Mux Coax 1/2 + AES-Übertrager) | wenig Eigenentwicklung, AK4499EX-Klang; Variante IC-DAC (ES9038Q2M) verworfen |
 | Acko-Klärung | Platinenmaße/Bohrbild, Ströme ±15 V, I²S-Direkteingang + ext. MCLK (Pegel, Frequenz vom FifoPi), Ausgänge als Stiftleiste statt XLR/Cinch, I²C-API für RP2040 | Anfrage an Acko, Platzhalter 175 × 102 im Platzplan |
 | Eingänge/Takt | Ian Canada ReceiverPi DDC II + FifoPi Q7 III | in beiden Varianten gesetzt |
+| **Display passt nicht** | Hersteller-DXF `doc/datenblaetter/DFR0524.dxf`: Deckglas 138,2 × 81, R7; aktiv 120,6 × 67,8 (mittig); Platine 124 × 71 (bisher fälschlich als Außenmaß angesetzt). Bei H = 78 Tasche nur 72 hoch. Waveshare 5" (Deckglas ca. 80 hoch) und 5,5" ebenfalls zu hoch. Optionen: (a) H = 88 (Tasche 82, = Datenblattmaß Original), (b) H = 78 mit nacktem Panel ohne Deckglas, (c) Deckglas besäumen (riskant) | Empfehlung (a); Entscheidung offen |
 | Displaymodul-Dicke | Annahme 3 mm (`DISP_T` in `cad/testfront.py`) | am gewählten Display messen |
 | Knopfposition X | 166 mm; Foto deutet 157–160 an | nach Testaufbau entscheiden |
 | Wand Displaytasche/Nut | 2,7 mm | bei Fertigung prüfen |
