@@ -9,6 +9,7 @@
 | Front | zweiteilig: Blende (Alu, Lippe 1,5 + Fase 0,4, Rand 4, Wände 2,5, Ecken hinter dem Band) + Träger (Alu, Displaytasche, Taster, Knopflager, Flansche, Laschen); Plexiglas 424,4 × 72,4 × 3 von hinten eingelegt, 1,2 unter der Lippe, 0,3 Dehnspalt, über Poron geklemmt, nicht geklebt | keine sichtbare Fuge Platte/Rahmen; Frontdicke T = 13,5 (Plattenfront 1,5 zurückgesetzt) |
 | Blende ↔ Träger | 6× M2,5 Senkkopf von unten (Unterseite); oben hält der Ring über die Seitenwände, Deckelfeder drückt von unten an den Nutsteg der Blende | oben keine sichtbaren Schrauben möglich (Platte muss von hinten durch) |
 | Bodenblech | Rechteck 424,6 × 310,6 × 1, von unten in einen umlaufenden Absatz gelegt (Front 5, Seitenwände 2,5, Rückwand 2 breit, 1 tief), Unterseite bündig; 10× ISO 7380 M3×6 (3 Frontflansch, 4 Wulst, 3 Querleiste) | Front, Seiten und Rückwand bis zur Unterkante; Blech von vorn/seitlich/hinten unsichtbar |
+| Ziernut / Ecke Deckel–Front | Ziernut 0,6 × 0,15 vorn entlang dem Stoß, seitlich 0,9 breit bis hinten offen, Innenecke R0,2; Fuge 0,3; Blende-Innenecke R0,5 (Fräser Ø1) | nach Bildvergleich (je Variante 2) |
 | Testfront | bleibt einteilig, Platte von vorn in Fenstergröße 1,5 zurückgesetzt (Fuge dort sichtbar) | nur Optik-/Funktionstest |
 | Deckelnut/Feder | nur links und rechts der Displaytasche (zwei Abschnitte mit Fräserauslauf) | bei H = 78 reicht die Displaytasche bis y 36, Nut läge darin |
 | Front-Abdeckung | Plexiglas vollflächig, Musterplatten 9H04 SC und 7H25 GT im Test vergleichen | Dead-Front-Optik wie Original |

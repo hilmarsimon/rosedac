@@ -40,10 +40,10 @@ GROOVE_H = TONGUE_T + 0.3             # Nuthöhe (0,3 Luft unten, Schaum drückt
 GROOVE_D = 4.0                        # Nuttiefe ins Band (Restband vorn 6 mm)
 TONGUE_L = GROOVE_D - 0.3             # Federlänge (Deckelstirn 0,3 vor dem Band)
 CUTTER_R = 10.0                       # Scheibenfräser Ø20: Auslauf an den Nutenden
-SEAT_R = 0.9                          # senkrechte Innenecken Band/Seitenwand = JOINT + DECO_W (Fräser Ø1,6, 5 tief):
-                                      # Linie Fuge + Ziernut ums Eck konstant breit (Außenbogen R0,9 um die rechtwinklige
-                                      # Innenecke der Ziernut), Deckelecke R = SEAT_R - JOINT = 0,6 liegt im Nutgrund
+SEAT_R = 0.5                          # senkrechte Innenecken Band/Seitenwand (Fräser Ø1, 5 tief), nach Bildvergleich
+                                      # (Variante B); Deckelecke R = SEAT_R - JOINT = 0,2 liegt im Nutgrund
 DECO_W, DECO_D = 0.6, 0.15            # Ziernut im Deckel: Breite, Tiefe (Foto); Lage siehe deco_rect()
+DECO_IR = 0.2                         # Radius der Ziernut-Innenecke (= sichtbare Deckelecke), nach Bildvergleich
 JOINT = 0.3                           # Fuge Deckel ↔ Front ringsum, Deckelecke konzentrisch zur Innenecke R SEAT_R
 BOT_T = 1.0                           # Bodenblech 1 mm
 BOT_LIP = 0.0                         # Bodenblech liegt im Absatz, Unterseite bündig mit der Geräteunterkante
@@ -386,7 +386,8 @@ def _plate(top, length, tongue):
     z_end = FL_Z0 - 0.3
     front = (cq.Workplane("XY").box(wf, t, zb - JOINT - FL_Z0 + 0.31, centered=(True, True, False))
              .translate((0, yc, FL_Z0 - 0.31)))
-    front = front.edges("|Y and >Z").fillet(SEAT_R - JOINT)     # konzentrisch zur Innenecke R SEAT_R: Fuge rundum JOINT
+    if SEAT_R - JOINT > 0.05:                  # konzentrisch zur Innenecke R SEAT_R: Fuge rundum JOINT
+        front = front.edges("|Y and >Z").fillet(SEAT_R - JOINT)
     body = (cq.Workplane("XY").box(wb, t, length, centered=(True, True, False)).translate((0, yc, z_end - length)))
     p = front.union(body)
     if tongue:                                 # zwei Federabschnitte passend zu den Nutabschnitten (je 1 mm kürzer)
@@ -532,6 +533,13 @@ def make_deco_groove():
     y0 = H / 2 - DECO_D
     g = (cq.Workplane("XY").box(2 * xo + 2, DECO_D + 0.02, zf + 1 - zi, centered=(True, False, False))
          .translate((0, y0, zi)))                               # Stirnlinie
+    if DECO_IR > 0.01:                                          # Innenecke der Ziernut (sichtbare Deckelecke) gerundet
+        for sx in (1, -1):
+            cx = sx * (xi - DECO_IR)
+            blk = (cq.Workplane("XY").box(DECO_IR, DECO_D + 0.02, DECO_IR, centered=(False, False, False))
+                   .translate((cx if sx > 0 else cx - DECO_IR, y0, zi - DECO_IR)))
+            cyl = cq.Solid.makeCylinder(DECO_IR, DECO_D + 0.2, cq.Vector(cx, y0 - 0.1, zi - DECO_IR), cq.Vector(0, 1, 0))
+            g = g.union(blk.cut(cq.Workplane("XY").add(cyl)))
     for sx in (1, -1):                                          # Seitenlinien bis hinten offen
         w = DECO_W + JOINT                                      # hinter der Frontzone so breit wie Nut + Fuge davor
         g = g.union(cq.Workplane("XY").box(w, DECO_D + 0.02, zf + 1 - (Z_REAR - 1), centered=(False, False, False))
